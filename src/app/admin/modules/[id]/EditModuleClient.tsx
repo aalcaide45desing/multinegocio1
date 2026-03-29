@@ -263,7 +263,58 @@ export default function EditModuleClient({ mod }: { mod: any }) {
               </div>
             </div>
           </div>
+          {/* Marca / Brand Global */}
+          <div className="p-6 bg-purple-900/10 border border-purple-500/30 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-purple-400 text-sm uppercase tracking-widest flex items-center gap-2">🌈 Marca Global (Tema)</h4>
+              <label className="relative inline-flex items-center cursor-pointer gap-2">
+                <input type="checkbox" className="sr-only peer" checked={config.brand?.applyGlobal ?? false} 
+                  onChange={e => set('brand', { ...(config.brand || {}), applyGlobal: e.target.checked })} />
+                <div className="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                <span className="text-[10px] text-zinc-400 uppercase font-black">Aplicar a TODO</span>
+              </label>
+            </div>
+            <p className="text-[11px] text-zinc-500">Si activas esto, todos los módulos ignorarán sus colores propios y usarán estos.</p>
+            <div className="grid grid-cols-2 gap-4">
+              {['primary', 'secondary', 'accent', 'background'].map(key => (
+                <div key={key}>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-bold">{key}</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={config.brand?.[key] || '#000'} 
+                      onChange={e => set('brand', { ...(config.brand || {}), [key]: e.target.value })} 
+                      className="w-8 h-8 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800" />
+                    <input type="text" value={config.brand?.[key] || '#000'} 
+                      onChange={e => set('brand', { ...(config.brand || {}), [key]: e.target.value })} 
+                      className="flex-1 px-2 py-1 bg-zinc-950 border border-zinc-800 rounded-lg text-white font-mono text-[10px] uppercase" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          ANNOUNCEMENT (Anuncio)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'announcement' && (
+        <div className="space-y-6">
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📢 Contenido del Anuncio</h4>
+            <textarea value={config.text || ''} onChange={e => set('text', e.target.value)} rows={2} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white resize-none shadow-inner" placeholder="Escribe tu anuncio aquí..." />
+            <div className="grid grid-cols-2 gap-4">
+              <input type="text" value={config.linkText || ''} onChange={e => set('linkText', e.target.value)} placeholder="Texto del enlace" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+              <input type="text" value={config.link || ''} onChange={e => set('link', e.target.value)} placeholder="URL..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+            </div>
+          </div>
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Estilo</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <input type="color" value={config.bgColor || '#7c3aed'} onChange={e => set('bgColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-zinc-950" />
+              <input type="color" value={config.textColor || '#ffffff'} onChange={e => set('textColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-zinc-950" />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════
@@ -408,20 +459,314 @@ export default function EditModuleClient({ mod }: { mod: any }) {
       {mod.type === 'contact' && (
         <>
           <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📬 Datos de Contacto</h4>
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📬 Datos y Mapa</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">Email</label>
+                <input type="email" value={config.email || ''} onChange={e => set('email', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">Teléfono</label>
+                <input type="text" value={config.phone || ''} onChange={e => set('phone', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-zinc-500 mb-1">Dirección Física</label>
+              <input type="text" value={config.address || ''} onChange={e => set('address', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+            </div>
+            <div>
+              <label className="block text-xs text-zinc-500 mb-1">URL de Mapa Embebido (Google Maps Iframe src)</label>
+              <input type="text" value={config.mapEmbedUrl || ''} onChange={e => set('mapEmbedUrl', e.target.value)} placeholder="https://www.google.com/maps/embed?..." className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={config.showSocials ?? false} onChange={e => set('showSocials', e.target.checked)} className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 accent-purple-500" />
+                <span className="text-sm text-zinc-300">Mostrar Redes Sociales</span>
+              </label>
+            </div>
+            {config.showSocials && (
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                {['Instagram','Facebook','TikTok','Twitter'].map(s => (
+                  <div key={s}>
+                    <label className="block text-[10px] text-zinc-500 mb-1 uppercase tracking-wider">{s}</label>
+                    <input type="text" value={config[s.toLowerCase()] || ''} onChange={e => set(s.toLowerCase(), e.target.value)} placeholder="URL..." className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-xs" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          REVIEWS (Reseñas)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'reviews' && (
+        <>
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
             <div>
               <label className="block text-xs text-zinc-500 mb-1">Título de la sección</label>
               <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
             </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Correo electrónico</label>
-              <input type="email" value={config.email || ''} onChange={e => set('email', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="font-medium text-white text-sm">⭐ Listado de Reseñas</h4>
+              <button onClick={() => addArrayItem('reviews', { author: "Nombre Cliente", text: "Excelente servicio...", rating: 5 })}
+                className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-1.5 px-3 rounded-lg transition">+ Reseña</button>
             </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Teléfono</label>
-              <input type="text" value={config.phone || ''} onChange={e => set('phone', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+            <div className="space-y-4">
+              {(config.reviews || []).map((r: any, idx: number) => (
+                <div key={r.id || idx} className="p-4 bg-zinc-900 border border-zinc-700/50 rounded-xl relative group space-y-3">
+                  <button onClick={() => removeArrayItem('reviews', idx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input type="text" value={r.author || ''} onChange={e => handleArrayChange('reviews', idx, 'author', e.target.value)} placeholder="Autor" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
+                    <select value={r.rating || 5} onChange={e => handleArrayChange('reviews', idx, 'rating', parseInt(e.target.value))} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm">
+                      {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Estrellas</option>)}
+                    </select>
+                  </div>
+                  <textarea value={r.text || ''} onChange={e => handleArrayChange('reviews', idx, 'text', e.target.value)} placeholder="Texto de la reseña..." rows={2} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm resize-none" />
+                </div>
+              ))}
             </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          SCHEDULE (Horario)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'schedule' && (
+        <>
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📅 Horario Comercial</h4>
+            <div className="space-y-2">
+              {(config.days || []).map((d: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
+                  <span className="text-sm font-bold text-white w-20 shrink-0">{d.day}</span>
+                  {!d.closed ? (
+                    <>
+                      <input type="text" value={d.open} onChange={e => handleArrayChange('days', idx, 'open', e.target.value)} className="flex-1 px-2 py-1 bg-black/40 border border-zinc-800 rounded text-white text-xs text-center" />
+                      <span className="text-zinc-600">a</span>
+                      <input type="text" value={d.close} onChange={e => handleArrayChange('days', idx, 'close', e.target.value)} className="flex-1 px-2 py-1 bg-black/40 border border-zinc-800 rounded text-white text-xs text-center" />
+                    </>
+                  ) : (
+                    <span className="flex-1 text-center text-red-500 text-xs font-bold uppercase tracking-widest">Cerrado</span>
+                  )}
+                  <label className="flex items-center gap-2 cursor-pointer ml-auto">
+                    <input type="checkbox" checked={d.closed} onChange={e => handleArrayChange('days', idx, 'closed', e.target.checked)} className="w-4 h-4 rounded accent-red-500" />
+                    <span className="text-[10px] text-zinc-500 uppercase font-black">Cerrado</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          PRICING (Precios)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'pricing' && (
+        <>
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
+            <div className="flex justify-between items-center">
+              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">💰 Tarifario</h4>
+              <button onClick={() => addArrayItem('categories', { name: "Nueva Categoría", items: [] })}
+                className="text-xs bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-1.5 px-3 rounded-lg">+ Categoría</button>
+            </div>
+            <div className="space-y-6">
+              {(config.categories || []).map((cat: any, cIdx: number) => (
+                <div key={cat.id || cIdx} className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-2xl relative">
+                  <button onClick={() => removeArrayItem('categories', cIdx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1">✕</button>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-bold tracking-widest">Nombre Categoría</label>
+                  <input type="text" value={cat.name} onChange={e => handleArrayChange('categories', cIdx, 'name', e.target.value)} className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-xl text-white font-bold mb-4" />
+                  
+                  <div className="space-y-3">
+                    {(cat.items || []).map((item: any, iIdx: number) => (
+                      <div key={iIdx} className="flex gap-2 items-start bg-black/40 p-3 rounded-xl border border-zinc-800">
+                        <div className="flex-1 space-y-2">
+                          <input type="text" value={item.name} onChange={e => {
+                            const newCats = [...config.categories]; newCats[cIdx].items[iIdx].name = e.target.value; set('categories', newCats)
+                          }} placeholder="Servicio" className="w-full px-2 py-1 bg-transparent border-b border-zinc-800 text-white text-sm" />
+                          <input type="text" value={item.description} onChange={e => {
+                            const newCats = [...config.categories]; newCats[cIdx].items[iIdx].description = e.target.value; set('categories', newCats)
+                          }} placeholder="Descripción corta" className="w-full px-2 py-1 bg-transparent border-b border-zinc-800 text-zinc-500 text-xs" />
+                        </div>
+                        <input type="text" value={item.price} onChange={e => {
+                          const newCats = [...config.categories]; newCats[cIdx].items[iIdx].price = e.target.value; set('categories', newCats)
+                        }} className="w-16 px-2 py-1 bg-zinc-800 rounded font-black text-center text-white" />
+                        <button onClick={() => {
+                          const newCats = [...config.categories]; newCats[cIdx].items.splice(iIdx, 1); set('categories', newCats)
+                        }} className="text-zinc-600 py-1">✕</button>
+                      </div>
+                    ))}
+                    <button onClick={() => {
+                      const newCats = [...config.categories]; newCats[cIdx].items.push({ name: 'Nuevo Item', price: '0' }); set('categories', newCats)
+                    }} className="w-full py-2 border border-zinc-800 border-dashed rounded-xl text-xs text-zinc-500 hover:bg-zinc-800 transition">+ Añadir Servicio</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          GALLERY / TEAM / STATS (Compactos)
+      ══════════════════════════════════════════════ */}
+      {(mod.type === 'gallery' || mod.type === 'team' || mod.type === 'stats') && (
+        <>
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+            <div className="flex justify-between items-center">
+              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">
+                {mod.type === 'gallery' ? '🖼️ Cuadrícula de Fotos' : mod.type === 'team' ? '👥 Miembros del Equipo' : '📊 Cifras Importantes'}
+              </h4>
+              <button 
+                onClick={() => addArrayItem(mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats', 
+                  mod.type === 'gallery' ? { url: '', alt: '' } : mod.type === 'team' ? { name: 'Nombre', role: 'Cargo', imageUrl: '' } : { number: '100', label: 'Escribe algo' })}
+                className="text-xs bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1.5 px-3 rounded-lg transition"
+              >+ Añadir</button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(config[mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats'] || []).map((item: any, idx: number) => (
+                <div key={idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl relative space-y-2">
+                  <button onClick={() => removeArrayItem(mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats', idx)} className="absolute top-1 right-1 text-zinc-600 hover:text-red-400">✕</button>
+                  {mod.type === 'gallery' && (
+                    <input type="text" value={item.url} onChange={e => handleArrayChange('images', idx, 'url', e.target.value)} placeholder="URL de la imagen" className="w-full px-2 py-1 bg-black text-white text-xs border border-zinc-800 rounded" />
+                  )}
+                  {mod.type === 'team' && (
+                    <>
+                      <input type="text" value={item.name} onChange={e => handleArrayChange('members', idx, 'name', e.target.value)} placeholder="Nombre" className="w-full px-2 py-1 bg-black text-white text-xs border border-zinc-800 rounded font-bold" />
+                      <input type="text" value={item.role} onChange={e => handleArrayChange('members', idx, 'role', e.target.value)} placeholder="Cargo" className="w-full px-2 py-1 bg-black text-zinc-400 text-[10px] border border-zinc-800 rounded" />
+                      <input type="text" value={item.imageUrl} onChange={e => handleArrayChange('members', idx, 'imageUrl', e.target.value)} placeholder="Foto URL" className="w-full px-2 py-1 bg-black text-white text-[10px] border border-zinc-800 rounded italic" />
+                    </>
+                  )}
+                  {mod.type === 'stats' && (
+                    <>
+                      <input type="text" value={item.number} onChange={e => handleArrayChange('stats', idx, 'number', e.target.value)} placeholder="Número" className="w-full px-2 py-1 bg-black text-white text-base border border-zinc-800 rounded font-black text-center" />
+                      <input type="text" value={item.label} onChange={e => handleArrayChange('stats', idx, 'label', e.target.value)} placeholder="Etiqueta" className="w-full px-2 py-1 bg-black text-zinc-500 text-xs border border-zinc-800 rounded text-center" />
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          CTA BANNER
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'cta_banner' && (
+        <>
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Contenido CTA</h4>
+            <input type="text" value={config.badgeText} onChange={e => set('badgeText', e.target.value)} placeholder="Badge (ej: Oferta)" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm" />
+            <input type="text" value={config.title} onChange={e => set('title', e.target.value)} placeholder="Título llamativo" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-bold" />
+            <textarea value={config.subtitle} onChange={e => set('subtitle', e.target.value)} placeholder="Subtítulo..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm resize-none" />
+            <div className="grid grid-cols-2 gap-3">
+              <input type="text" value={config.btnText} onChange={e => set('btnText', e.target.value)} placeholder="Texto Botón" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+              <input type="text" value={config.btnUrl} onChange={e => set('btnUrl', e.target.value)} placeholder="URL..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          STEPS / VIDEO / NEWSLETTER / COUNTDOWN
+      ══════════════════════════════════════════════ */}
+      {(mod.type === 'steps' || mod.type === 'video' || mod.type === 'newsletter' || mod.type === 'countdown') && (
+        <>
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">⚙️ Configuración {mod.type}</h4>
+            {mod.type === 'video' && (
+              <input type="text" value={config.videoUrl} onChange={e => set('videoUrl', e.target.value)} placeholder="URL Video (Youtube Embed)" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
+            )}
+            {mod.type === 'countdown' && (
+              <input type="date" value={config.targetDate} onChange={e => set('targetDate', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white shadow-inner appearance-none" />
+            )}
+            {mod.type === 'steps' && (
+              <div className="space-y-3">
+                {(config.steps || []).map((s: any, idx: number) => (
+                  <div key={idx} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl space-y-2">
+                    <input type="text" value={s.title} onChange={e => handleArrayChange('steps', idx, 'title', e.target.value)} placeholder="Título Paso" className="w-full px-2 py-1 bg-black text-white text-sm font-bold rounded" />
+                    <textarea value={s.description} onChange={e => handleArrayChange('steps', idx, 'description', e.target.value)} placeholder="Descripción Paso" className="w-full px-2 py-1 bg-black text-white text-xs rounded resize-none" />
+                  </div>
+                ))}
+                <button onClick={() => addArrayItem('steps', { title: 'Nuevo Paso', description: 'Explica qué hay que hacer' })} className="w-full py-2 border border-zinc-800 border-dashed rounded-xl text-xs text-zinc-500 hover:bg-zinc-800">+ Añadir Paso</button>
+              </div>
+            )}
+            {mod.type === 'newsletter' && (
+              <div className="space-y-3">
+                <input type="text" value={config.title} onChange={e => set('title', e.target.value)} placeholder="Título" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
+                <input type="text" value={config.btnText} onChange={e => set('btnText', e.target.value)} placeholder="Texto Botón" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          IMAGE + TEXT / TEXT COLUMNS / SOCIAL / BOOKING / FOOTER
+      ══════════════════════════════════════════════ */}
+      {(mod.type === 'image_text' || mod.type === 'text_columns' || mod.type === 'social_links' || mod.type === 'booking' || mod.type === 'footer') && (
+        <>
+          {mod.type !== 'footer' && <StyleSection config={config} onChange={set} />}
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🔗 Configuración Avanzada</h4>
+            {mod.type === 'image_text' && (
+              <div className="space-y-3">
+                <input type="text" value={config.imageUrl} onChange={e => set('imageUrl', e.target.value)} placeholder="URL Imagen" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
+                <select value={config.layout} onChange={e => set('layout', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white">
+                  <option value="image_left">Imagen a la Izquierda</option>
+                  <option value="image_right">Imagen a la Derecha</option>
+                </select>
+                <input type="text" value={config.title} onChange={e => set('title', e.target.value)} placeholder="Título" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
+              </div>
+            )}
+            {mod.type === 'text_columns' && (
+              <div className="space-y-3">
+                {(config.columns || []).map((c: any, idx: number) => (
+                  <div key={idx} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl space-y-2">
+                    <input type="text" value={c.title} onChange={e => handleArrayChange('columns', idx, 'title', e.target.value)} placeholder="Título Columna" className="w-full px-2 py-1 bg-black text-white text-sm font-bold rounded" />
+                    <textarea value={c.text} onChange={e => handleArrayChange('columns', idx, 'text', e.target.value)} placeholder="Texto..." className="w-full px-2 py-1 bg-black text-white text-xs rounded resize-none" />
+                  </div>
+                ))}
+                <button onClick={() => addArrayItem('columns', { title: 'Nueva Columna', text: 'Escribe algo...' })} className="w-full py-2 border border-zinc-800 border-dashed rounded-xl text-xs text-zinc-500 hover:bg-zinc-800">+ Añadir Columna</button>
+              </div>
+            )}
+            {mod.type === 'social_links' && (
+              <div className="grid grid-cols-2 gap-3">
+                {['Instagram','Facebook','TikTok','Twitter','LinkedIn','YouTube'].map(s => (
+                  <div key={s}>
+                    <label className="block text-[10px] text-zinc-500 mb-1 uppercase tracking-wider">{s}</label>
+                    <input type="text" value={config[s.toLowerCase()] || ''} onChange={e => set(s.toLowerCase(), e.target.value)} placeholder="URL..." className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-xs" />
+                  </div>
+                ))}
+              </div>
+            )}
+            {mod.type === 'booking' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                   <label className="flex items-center gap-2"><input type="checkbox" checked={config.showWhatsapp} onChange={e => set('showWhatsapp', e.target.checked)} /> <span className="text-xs text-white">WhatsApp</span></label>
+                   <label className="flex items-center gap-2"><input type="checkbox" checked={config.showPhone} onChange={e => set('showPhone', e.target.checked)} /> <span className="text-xs text-white">Teléfono</span></label>
+                </div>
+                <input type="text" value={config.whatsapp} onChange={e => set('whatsapp', e.target.value)} placeholder="Nº WhatsApp" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded text-white text-xs" />
+                <input type="text" value={config.bookingBtnText} onChange={e => set('bookingBtnText', e.target.value)} placeholder="Texto Botón Reserva" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded text-white text-xs" />
+              </div>
+            )}
+            {mod.type === 'footer' && (
+              <div className="space-y-3">
+                <input type="text" value={config.businessName} onChange={e => set('businessName', e.target.value)} placeholder="Nombre del Negocio" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-bold" />
+                <input type="text" value={config.copyrightText} onChange={e => set('copyrightText', e.target.value)} placeholder="Copyright..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+              </div>
+            )}
           </div>
         </>
       )}

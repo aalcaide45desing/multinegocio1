@@ -135,13 +135,14 @@ function NavbarModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function HeroModule({ config }: { config: any }) {
   const align = config.textAlign === 'left' ? 'text-left items-start' : config.textAlign === 'right' ? 'text-right items-end' : 'text-center items-center'
+  const bgSolid = config._global ? 'var(--brand-bg)' : (config.color || '#1a0533')
   const bgStyle = config.useGradient
-    ? { background: `linear-gradient(135deg, ${config.color || '#1a0533'}, ${config.gradientColor2 || '#0f172a'})` }
-    : { backgroundColor: config.color || '#1a0533' }
+    ? { background: `linear-gradient(135deg, ${config._global ? 'var(--brand-bg)' : (config.color || '#1a0533')}, ${config.gradientColor2 || '#0f172a'})` }
+    : { backgroundColor: bgSolid }
   const btns = config.buttons || (config.showPrimaryBtn !== false ? [{ id: '0', text: config.primaryBtnText || 'Ver más', url: config.primaryBtnUrl || '#', style: 'primary' }] : [])
 
   return (
-    <section className="relative overflow-hidden py-32 sm:py-40 md:py-52 px-4" style={{
+    <section className="relative overflow-hidden py-32 sm:py-40 md:py-60 px-4 flex items-center min-h-[80vh]" style={{
       ...bgStyle,
       backgroundImage: config.backgroundImageUrl ? `url(${config.backgroundImageUrl})` : undefined,
       backgroundSize: 'cover', backgroundPosition: 'center'
@@ -166,8 +167,10 @@ function FeaturesModule({ config }: { config: any }) {
   const cardCls = config.cardStyle === 'light' ? 'bg-white border border-zinc-200' : config.cardStyle === 'bordered' ? 'border-2 border-white/20' : 'bg-white/5 border border-white/10'
   const txt = config.cardStyle === 'light' ? 'text-zinc-900' : 'text-white'
   const sub = config.cardStyle === 'light' ? 'text-zinc-500' : 'text-white/60'
+  const accent = config._global ? 'var(--brand-primary)' : '#a855f7'
+  
   return (
-    <section className="py-20 sm:py-24 px-4 relative overflow-hidden" style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className="py-20 sm:py-32 px-4 relative overflow-hidden" style={{ backgroundColor: config._global ? 'var(--brand-bg)' : (config.color || '#18181b') }}>
       <Deco type={config.decoration} />
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
@@ -177,9 +180,9 @@ function FeaturesModule({ config }: { config: any }) {
         <div className={`grid grid-cols-1 ${cols} gap-5`}>
           {(config.cards || []).map((card: any, i: number) => (
             <div key={card.id || i} className={`p-6 sm:p-8 rounded-2xl hover:-translate-y-1 transition-all duration-300 ${cardCls}`}>
-              {card.emoji && <div className="text-3xl sm:text-4xl mb-4 sm:mb-5">{card.emoji}</div>}
-              <h3 className={`font-bold text-lg sm:text-xl mb-1 ${txt}`}>{card.title}</h3>
-              {card.subtitle && <p className="text-xs sm:text-sm font-semibold text-purple-400 mb-3 sm:mb-4">{card.subtitle}</p>}
+              {card.emoji && <div className="text-4xl mb-6">{card.emoji}</div>}
+              <h3 className={`font-bold text-xl sm:text-2xl mb-2 ${txt}`}>{card.title}</h3>
+              {card.subtitle && <p className="text-sm font-bold mb-4 uppercase tracking-widest" style={{ color: accent }}>{card.subtitle}</p>}
               {(card.paragraphs?.length > 0)
                 ? <div className="space-y-2">{card.paragraphs.map((p: string, pi: number) => <p key={pi} className={`text-sm leading-relaxed ${sub}`}>{p}</p>)}</div>
                 : card.description && <p className={`text-sm leading-relaxed ${sub}`}>{card.description}</p>}
@@ -244,10 +247,10 @@ function TextColumnsModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function ReviewsModule({ config }: { config: any }) {
   return (
-    <section className="py-20 sm:py-24 px-4 relative overflow-hidden" style={{ backgroundColor: config.color || '#09090b' }}>
+    <section className="py-20 sm:py-32 px-4 relative overflow-hidden" style={{ backgroundColor: config._global ? 'var(--brand-bg)' : (config.color || '#09090b') }}>
       <Deco type={config.decoration} />
       <div className="relative z-10 max-w-6xl mx-auto">
-        <h2 className="text-3xl sm:text-5xl font-bold text-white mb-12 sm:mb-16 text-center">{config.title || 'Reseñas'}</h2>
+        <h2 className="text-4xl sm:text-6xl font-black text-white mb-16 sm:mb-20 text-center tracking-tighter">{config.title || 'Reseñas'}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {(config.reviews || []).map((r: any, i: number) => (
             <div key={r.id || i} className="p-6 bg-white/5 border border-white/10 rounded-2xl flex flex-col gap-4">
@@ -267,10 +270,10 @@ function ReviewsModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function ScheduleModule({ config }: { config: any }) {
   return (
-    <section className="py-20 sm:py-24 px-4 relative overflow-hidden" style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className="py-20 sm:py-32 px-4 relative overflow-hidden" style={{ backgroundColor: config._global ? 'var(--brand-bg)' : (config.color || '#18181b') }}>
       <Deco type={config.decoration} />
       <div className="relative z-10 max-w-2xl mx-auto">
-        <h2 className="text-3xl sm:text-5xl font-bold text-white mb-10 sm:mb-12 text-center">{config.title || 'Horario'}</h2>
+        <h2 className="text-4xl sm:text-6xl font-black text-white mb-12 sm:mb-16 text-center tracking-tighter">{config.title || 'Horario'}</h2>
         <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
           {(config.days || []).map((d: any, i: number) => (
             <div key={i} className={`flex items-center justify-between px-5 sm:px-7 py-4 ${i > 0 ? 'border-t border-white/5' : ''}`}>
@@ -289,15 +292,15 @@ function ScheduleModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function PricingModule({ config }: { config: any }) {
   return (
-    <section className="py-20 sm:py-24 px-4 relative overflow-hidden" style={{ backgroundColor: config.color || '#09090b' }}>
+    <section className="py-20 sm:py-32 px-4 relative overflow-hidden" style={{ backgroundColor: config._global ? 'var(--brand-bg)' : (config.color || '#09090b') }}>
       <Deco type={config.decoration} />
       <div className="relative z-10 max-w-4xl mx-auto">
-        <h2 className="text-3xl sm:text-5xl font-bold text-white mb-12 sm:mb-16 text-center">{config.title || 'Precios'}</h2>
-        <div className="space-y-10">
+        <h2 className="text-4xl sm:text-6xl font-black text-white mb-16 sm:mb-20 text-center tracking-tighter">{config.title || 'Precios'}</h2>
+        <div className="space-y-12">
           {(config.categories || []).map((cat: any) => (
             <div key={cat.id}>
-              <h3 className="text-base font-bold text-purple-400 mb-4 uppercase tracking-wider">{cat.name}</h3>
-              <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+              <h3 className="text-sm font-black mb-6 uppercase tracking-[0.3em]" style={{ color: config._global ? 'var(--brand-primary)' : '#a855f7' }}>{cat.name}</h3>
+              <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
                 {(cat.items || []).map((item: any, i: number) => (
                   <div key={item.id || i} className={`flex items-center justify-between px-5 sm:px-7 py-4 gap-4 ${i > 0 ? 'border-t border-white/5' : ''}`}>
                     <div className="flex-1 min-w-0">
@@ -322,10 +325,10 @@ function PricingModule({ config }: { config: any }) {
 function GalleryModule({ config }: { config: any }) {
   const cols = config.columns === 2 ? 'grid-cols-2' : config.columns === 4 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'
   return (
-    <section className="py-20 sm:py-24 px-4 relative overflow-hidden" style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className="py-20 sm:py-32 px-4 relative overflow-hidden" style={{ backgroundColor: config._global ? 'var(--brand-bg)' : (config.color || '#18181b') }}>
       <Deco type={config.decoration} />
       <div className="relative z-10 max-w-7xl mx-auto">
-        {config.title && <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 text-center">{config.title}</h2>}
+        {config.title && <h2 className="text-4xl sm:text-6xl font-black text-white mb-4 text-center tracking-tighter">{config.title}</h2>}
         {config.subtitle && <p className="text-white/60 text-center mb-10 sm:mb-12">{config.subtitle}</p>}
         <div className={`grid ${cols} gap-2 sm:gap-3`}>
           {(config.images || []).map((img: any, i: number) => (
@@ -407,10 +410,10 @@ function CtaBannerModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function StepsModule({ config }: { config: any }) {
   return (
-    <section className="py-20 sm:py-24 px-4 relative overflow-hidden" style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className="py-20 sm:py-32 px-4 relative overflow-hidden" style={{ backgroundColor: config._global ? 'var(--brand-bg)' : (config.color || '#18181b') }}>
       <Deco type={config.decoration} />
       <div className="relative z-10 max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl sm:text-5xl font-bold text-white mb-3">{config.title || '¿Cómo funciona?'}</h2>
+        <h2 className="text-4xl sm:text-6xl font-black text-white mb-4 tracking-tighter">{config.title || '¿Cómo funciona?'}</h2>
         {config.subtitle && <p className="text-white/60 text-lg sm:text-xl mb-12 sm:mb-16">{config.subtitle}</p>}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-8 sm:mt-12">
           {(config.steps || []).map((s: any, i: number) => (
@@ -601,8 +604,10 @@ function SocialLinksModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function FooterModule({ config }: { config: any }) {
   const s = config.socials || {}
+  const bg = config._global ? 'var(--brand-bg)' : (config.bgColor || '#09090b')
+  const txt = config.textColor || '#fff'
   return (
-    <footer className="py-12 sm:py-16 px-4" style={{ backgroundColor: config.bgColor || '#09090b' }}>
+    <footer className="py-16 sm:py-24 px-4 border-t border-white/5" style={{ backgroundColor: bg }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between gap-8 mb-10 sm:mb-12">
           <div>
@@ -643,33 +648,58 @@ export default async function HomePage() {
   const footer = mods.find((m: any) => m.type === 'footer')
   const body = mods.filter((m: any) => !['announcement', 'navbar', 'footer'].includes(m.type))
 
+  // Extraer Branding Global
+  const brand = navbar?.config?.brand
+  const useGlobal = brand?.applyGlobal ?? false
+
+  const globalStyles = useGlobal ? (
+    <style dangerouslySetInnerHTML={{ __html: `
+      :root {
+        --brand-primary: ${brand.primary || '#7c3aed'};
+        --brand-secondary: ${brand.secondary || '#06b6d4'};
+        --brand-accent: ${brand.accent || '#f59e0b'};
+        --brand-bg: ${brand.background || '#09090b'};
+      }
+      .bg-brand-primary { background-color: var(--brand-primary); }
+      .bg-brand-secondary { background-color: var(--brand-secondary); }
+      .bg-brand-bg { background-color: var(--brand-bg); }
+      .text-brand-primary { color: var(--brand-primary); }
+      .text-brand-accent { color: var(--brand-accent); }
+      .border-brand-primary { border-color: var(--brand-primary); }
+    `}} />
+  ) : null
+
   const render = (mod: any) => {
+    // Si useGlobal es true, inyectamos la marca en el config del módulo para que sepa que debe priorizarla
+    const config = useGlobal ? { ...mod.config, _global: brand } : mod.config
+
     switch (mod.type) {
-      case 'hero':        return <HeroModule      key={mod.id} config={mod.config} />
-      case 'features':    return <FeaturesModule  key={mod.id} config={mod.config} />
-      case 'image_text':  return <ImageTextModule key={mod.id} config={mod.config} />
-      case 'text_columns':return <TextColumnsModule key={mod.id} config={mod.config} />
-      case 'reviews':     return <ReviewsModule   key={mod.id} config={mod.config} />
-      case 'schedule':    return <ScheduleModule  key={mod.id} config={mod.config} />
-      case 'pricing':     return <PricingModule   key={mod.id} config={mod.config} />
-      case 'gallery':     return <GalleryModule   key={mod.id} config={mod.config} />
-      case 'team':        return <TeamModule      key={mod.id} config={mod.config} />
-      case 'stats':       return <StatsModule     key={mod.id} config={mod.config} />
-      case 'cta_banner':  return <CtaBannerModule key={mod.id} config={mod.config} />
-      case 'steps':       return <StepsModule     key={mod.id} config={mod.config} />
-      case 'booking':     return <BookingModule   key={mod.id} config={mod.config} />
-      case 'faq':         return <FaqModule       key={mod.id} config={mod.config} />
-      case 'contact':     return <ContactModule   key={mod.id} config={mod.config} />
-      case 'video':       return <VideoModule     key={mod.id} config={mod.config} />
-      case 'newsletter':  return <NewsletterModule key={mod.id} config={mod.config} />
-      case 'countdown':   return <CountdownModule key={mod.id} config={mod.config} />
-      case 'social_links':return <SocialLinksModule key={mod.id} config={mod.config} />
+      case 'hero':        return <HeroModule      key={mod.id} config={config} />
+      case 'features':    return <FeaturesModule  key={mod.id} config={config} />
+      case 'image_text':  return <ImageTextModule key={mod.id} config={config} />
+      case 'text_columns':return <TextColumnsModule key={mod.id} config={config} />
+      case 'reviews':     return <ReviewsModule   key={mod.id} config={config} />
+      case 'schedule':    return <ScheduleModule  key={mod.id} config={config} />
+      case 'pricing':     return <PricingModule   key={mod.id} config={config} />
+      case 'gallery':     return <GalleryModule   key={mod.id} config={config} />
+      case 'team':        return <TeamModule      key={mod.id} config={config} />
+      case 'stats':       return <StatsModule     key={mod.id} config={config} />
+      case 'cta_banner':  return <CtaBannerModule key={mod.id} config={config} />
+      case 'steps':       return <StepsModule     key={mod.id} config={config} />
+      case 'booking':     return <BookingModule   key={mod.id} config={config} />
+      case 'faq':         return <FaqModule       key={mod.id} config={config} />
+      case 'contact':     return <ContactModule   key={mod.id} config={config} />
+      case 'video':       return <VideoModule     key={mod.id} config={config} />
+      case 'newsletter':  return <NewsletterModule key={mod.id} config={config} />
+      case 'countdown':   return <CountdownModule key={mod.id} config={config} />
+      case 'social_links':return <SocialLinksModule key={mod.id} config={config} />
       default:            return null
     }
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen" style={{ backgroundColor: useGlobal ? 'var(--brand-bg)' : '#000' }}>
+      {globalStyles}
       {announcement && <AnnouncementModule config={announcement.config} />}
       {navbar ? <NavbarModule config={navbar.config} /> : (
         <nav className="sticky top-0 z-50 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-black/80 backdrop-blur-xl border-b border-white/5">
@@ -677,6 +707,7 @@ export default async function HomePage() {
           <a href="/login" className="px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold rounded-full border border-white/20 text-white hover:bg-white hover:text-black transition">Panel Admin</a>
         </nav>
       )}
+      
       {body.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[80vh] text-zinc-500 text-center px-4">
           <span className="text-5xl sm:text-6xl mb-6">🛠️</span>
@@ -684,7 +715,8 @@ export default async function HomePage() {
           <p className="text-sm sm:text-base">El administrador todavía no ha publicado ningún módulo.</p>
         </div>
       ) : body.map(render)}
-      {footer && <FooterModule config={footer.config} />}
+
+      {footer && <FooterModule config={useGlobal ? { ...footer.config, _global: brand } : footer.config} />}
     </main>
   )
 }
