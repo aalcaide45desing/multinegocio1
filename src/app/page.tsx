@@ -168,7 +168,7 @@ function HeroModule({ config }: { config: any }) {
       {config.backgroundImageUrl && (
         <>
           <div className="absolute inset-0 z-0">
-            <Image src={config.backgroundImageUrl} alt="Hero" fill className="object-cover" priority />
+            <Image src={config.backgroundImageUrl} alt="Hero" fill sizes="100vw" className="object-cover" priority />
           </div>
           <div className="absolute inset-0 z-[1] bg-black/60" style={{ opacity: config.imageOverlayOpacity ?? 0.6 }} />
         </>
@@ -341,7 +341,7 @@ function ImageTextModule({ config }: { config: any }) {
        <div className={`${mw} mx-auto relative z-10 flex flex-col ${rev} gap-12 lg:gap-24 items-center`}>
           <div className="flex-1 w-full">
              <div className="relative aspect-square rounded-[3rem] overflow-hidden border-8 border-white/5 shadow-2xl group">
-                {config.imageUrl ? <Image src={config.imageUrl} alt={config.imageAlt || 'Image'} fill className="object-cover group-hover:scale-105 transition-transform duration-700" /> : <div className="w-full h-full bg-zinc-800" />}
+                {config.imageUrl ? <Image src={config.imageUrl} alt={config.imageAlt || 'Image'} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" /> : <div className="w-full h-full bg-zinc-800" />}
              </div>
           </div>
           <div className="flex-1 space-y-8">
@@ -475,7 +475,7 @@ function TeamModule({ config }: { config: any }) {
           {(config.members || []).map((m: any, i: number) => (
             <div key={i} className="group p-10 bg-white/[0.02] border border-white/5 rounded-[3rem] text-center hover:bg-white/[0.05] transition-all">
               <div className="w-40 h-40 rounded-[2.5rem] mx-auto mb-10 overflow-hidden relative border-4 border-white/5 group-hover:scale-105 transition-transform">
-                {m.imageUrl ? <Image src={m.imageUrl} alt={m.name} fill className="object-cover" /> : <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-5xl">👤</div>}
+                {m.imageUrl ? <Image src={m.imageUrl} alt={m.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /> : <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-5xl">👤</div>}
               </div>
               <h3 className="text-3xl font-black text-white mb-2 uppercase">{m.name}</h3>
               <p className="text-xs font-black uppercase tracking-widest text-purple-400 mb-8">{m.role}</p>
@@ -496,7 +496,7 @@ function GalleryModule({ config }: { config: any }) {
        <div className={`${mw} mx-auto relative z-10 grid grid-cols-2 md:grid-cols-4 gap-2`}>
           {(config.images || []).map((img: any, i: number) => (
              <div key={i} className="aspect-square relative overflow-hidden group rounded-[2rem]">
-                {img.url ? <Image src={img.url} alt="Gallery" fill className="object-cover group-hover:scale-110 transition-transform duration-1000" /> : <div className="w-full h-full bg-zinc-900" />}
+                {img.url ? <Image src={img.url} alt="Gallery" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover group-hover:scale-110 transition-transform duration-1000" /> : <div className="w-full h-full bg-zinc-900" />}
              </div>
           ))}
        </div>
