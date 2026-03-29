@@ -69,6 +69,40 @@ const MAX_WIDTH: Record<string, string> = {
   full: 'max-w-none px-4 sm:px-12'
 }
 
+// ─── Mapeos de Tipografía ────────────────────────────────────────────────────
+const TITLE_SIZE: Record<string, string> = {
+  xs: 'text-xl sm:text-2xl',
+  sm: 'text-2xl sm:text-3xl',
+  md: 'text-3xl sm:text-4xl',
+  lg: 'text-4xl sm:text-5xl',
+  xl: 'text-5xl sm:text-6xl',
+  '2xl': 'text-5xl sm:text-7xl',
+}
+
+const SUBTITLE_SIZE: Record<string, string> = {
+  xs: 'text-xs sm:text-sm',
+  sm: 'text-sm sm:text-base',
+  md: 'text-base sm:text-lg',
+  lg: 'text-lg sm:text-xl',
+  xl: 'text-xl sm:text-2xl',
+}
+
+const BODY_SIZE: Record<string, string> = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  md: 'text-sm sm:text-base',
+  lg: 'text-base sm:text-lg',
+  xl: 'text-lg sm:text-xl',
+}
+
+function ts(config: any) {
+  return {
+    title: TITLE_SIZE[config.titleSize] || TITLE_SIZE.lg,
+    subtitle: SUBTITLE_SIZE[config.subtitleSize] || SUBTITLE_SIZE.md,
+    body: BODY_SIZE[config.bodySize] || BODY_SIZE.md,
+  }
+}
+
 // ════════════════════════════════════════════════════════
 // ANNOUNCEMENT BAR
 // ════════════════════════════════════════════════════════
@@ -128,6 +162,7 @@ function HeroModule({ config }: { config: any }) {
   const align = config.textAlign === 'left' ? 'text-left items-start' : config.textAlign === 'right' ? 'text-right items-end' : 'text-center items-center'
   const py = PADDING_Y[config.paddingY] || PADDING_Y.xl
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
+  const t = ts({ ...config, titleSize: config.titleSize || 'xl', subtitleSize: config.subtitleSize || 'lg' })
   return (
     <section className={`relative overflow-hidden ${py} px-4 flex items-center min-h-[70vh]`} style={{ backgroundColor: config.color || '#18181b' }}>
       {config.backgroundImageUrl && (
@@ -141,8 +176,8 @@ function HeroModule({ config }: { config: any }) {
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto flex flex-col ${align} gap-8 w-full`}>
         {config.preTitleBadge && <span className="inline-block px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-white font-black text-[10px] sm:text-xs uppercase tracking-[0.3em]">{config.preTitleBadge}</span>}
-        <h1 className="text-5xl sm:text-7xl md:text-9xl font-black text-white tracking-tighter leading-[0.9] max-w-4xl drop-shadow-2xl">{config.title || 'Bienvenidos'}</h1>
-        <p className="text-lg sm:text-2xl text-white/70 max-w-2xl font-medium leading-relaxed">{config.subtitle}</p>
+        <h1 className={`${t.title} font-black text-white tracking-tighter leading-[0.9] max-w-4xl drop-shadow-2xl`}>{config.title || 'Bienvenidos'}</h1>
+        <p className={`${t.subtitle} text-white/70 max-w-2xl font-medium leading-relaxed`}>{config.subtitle}</p>
         <Buttons buttons={config.buttons} config={config} />
       </div>
     </section>
@@ -161,7 +196,7 @@ function ScheduleModule({ config }: { config: any }) {
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
         <div className="text-center mb-16 max-w-2xl mx-auto">
-          <h2 className="text-5xl sm:text-8xl font-black text-white mb-6 tracking-tighter">{config.title || 'Horarios'}</h2>
+          <h2 className={`${ts(config).title} font-black text-white mb-6 tracking-tighter`}>{config.title || 'Horarios'}</h2>
           <div className="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-purple-400 tracking-[0.2em] mb-8">Horario Comercial</div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -206,8 +241,8 @@ function StatsModule({ config }: { config: any }) {
        <div className={`${mw} mx-auto relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 text-center`}>
           {(config.stats || []).map((s: any, i: number) => (
              <div key={i} className="group">
-                <p className="text-4xl sm:text-7xl font-black text-white tracking-tighter mb-2 group-hover:scale-110 transition-transform">{s.number}</p>
-                <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-zinc-500 leading-tight">{s.label}</p>
+                <p className={`${ts({ ...config, titleSize: config.titleSize || 'lg' }).title} font-black text-white tracking-tighter mb-2 group-hover:scale-110 transition-transform`}>{s.number}</p>
+                 <p className={`${ts(config).body} font-black uppercase tracking-[0.3em] text-zinc-500 leading-tight`}>{s.label}</p>
              </div>
           ))}
        </div>
@@ -225,7 +260,7 @@ function FaqModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#000' }}>
        <Deco type={config.decoration} />
        <div className={`${mw} mx-auto relative z-10`}>
-          <h2 className="text-5xl sm:text-7xl font-black text-white mb-16 text-center tracking-tighter">{config.title || 'FAQ'}</h2>
+          <h2 className={`${ts(config).title} font-black text-white mb-16 text-center tracking-tighter`}>{config.title || 'FAQ'}</h2>
           <div className="space-y-4">
              {(config.faqs || []).map((faq: any, i: number) => (
                <details key={i} className="group bg-white/[0.02] border border-white/5 rounded-[2rem] overflow-hidden">
@@ -254,8 +289,8 @@ function StepsModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
        <div className={`${mw} mx-auto relative z-10`}>
           <div className="mb-20">
-             <h2 className="text-5xl sm:text-8xl font-black text-white mb-4 tracking-tighter">{config.title || 'Proceso'}</h2>
-             {config.subtitle && <p className="text-zinc-500 text-xl font-medium uppercase tracking-widest">{config.subtitle}</p>}
+             <h2 className={`${ts(config).title} font-black text-white mb-4 tracking-tighter`}>{config.title || 'Proceso'}</h2>
+              {config.subtitle && <p className={`text-zinc-500 ${ts(config).subtitle} font-medium uppercase tracking-widest`}>{config.subtitle}</p>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 sm:gap-20">
              {(config.steps || []).map((s: any, i: number) => (
@@ -283,8 +318,8 @@ function VideoModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative bg-zinc-950 overflow-hidden`} style={{ backgroundColor: config.color }}>
        <div className={`${mw} mx-auto relative z-10`}>
           <div className="text-center mb-12">
-             <h2 className="text-4xl sm:text-7xl font-black text-white tracking-tighter">{config.title || 'Vídeo'}</h2>
-             {config.subtitle && <p className="text-zinc-500 text-sm sm:text-base mt-4 uppercase tracking-widest">{config.subtitle}</p>}
+             <h2 className={`${ts(config).title} font-black text-white tracking-tighter`}>{config.title || 'Vídeo'}</h2>
+              {config.subtitle && <p className={`text-zinc-500 ${ts(config).subtitle} mt-4 uppercase tracking-widest`}>{config.subtitle}</p>}
           </div>
           <div className="aspect-video w-full rounded-[3rem] overflow-hidden border-8 border-white/5 shadow-2xl relative">
              <iframe src={config.videoUrl?.replace('watch?v=', 'embed/')} title="Video" className="absolute inset-0 w-full h-full" allowFullScreen />
@@ -311,7 +346,7 @@ function ImageTextModule({ config }: { config: any }) {
           </div>
           <div className="flex-1 space-y-8">
              {config.badge && <span className="inline-block px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-400 font-bold text-[10px] uppercase tracking-widest">{config.badge}</span>}
-             <h2 className="text-5xl sm:text-7xl font-black text-white leading-[0.9] tracking-tighter uppercase">{config.title}</h2>
+             <h2 className={`${ts(config).title} font-black text-white leading-[0.9] tracking-tighter uppercase`}>{config.title}</h2>
              <div className="space-y-4">
                {(config.paragraphs || []).map((p: string, i: number) => (
                  <p key={i} className="text-zinc-500 text-lg sm:text-xl leading-relaxed font-medium">{p}</p>
@@ -334,8 +369,8 @@ function NewsletterModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#000' }}>
        <Deco type={config.decoration} />
        <div className={`relative z-10 ${mw} mx-auto text-center`}>
-          <h2 className="text-5xl sm:text-8xl font-black text-white mb-6 tracking-tighter leading-none">{config.title || 'Newsletter'}</h2>
-          <p className="text-zinc-500 text-xl font-medium mb-12">{config.subtitle || 'Suscríbete para novedades.'}</p>
+          <h2 className={`${ts(config).title} font-black text-white mb-6 tracking-tighter leading-none`}>{config.title || 'Newsletter'}</h2>
+           <p className={`text-zinc-500 ${ts(config).subtitle} font-medium mb-12`}>{config.subtitle || 'Suscríbete para novedades.'}</p>
           <form className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
              <input type="email" placeholder={config.placeholder || 'Email...'} className="flex-1 bg-white/5 border border-white/10 rounded-full px-8 py-5 text-white focus:border-purple-500 outline-none transition-all shadow-inner" />
              <button className="px-10 py-5 bg-white text-black font-black uppercase tracking-widest rounded-full hover:scale-105 transition-transform shadow-xl">{config.btnText || 'Suscribirme'}</button>
@@ -356,7 +391,7 @@ function CountdownModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden bg-purple-600`} style={{ backgroundColor: config.color }}>
        <Deco type={config.decoration || 'grid'} />
        <div className={`relative z-10 ${mw} mx-auto text-center text-white`}>
-          <h2 className="text-5xl sm:text-8xl font-black mb-12 tracking-tighter leading-none">{config.title || 'Falta poco'}</h2>
+          <h2 className={`${ts(config).title} font-black mb-12 tracking-tighter leading-none`}>{config.title || 'Falta poco'}</h2>
           <div className="grid grid-cols-4 gap-4 sm:gap-8 mb-16">
              {['Días', 'Horas', 'Min', 'Seg'].map((unit, i) => (
                <div key={i} className="p-4 sm:p-8 bg-black/20 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
@@ -382,7 +417,7 @@ function FeaturesModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
-        <h2 className="text-5xl sm:text-8xl font-black text-white mb-24 text-center tracking-tighter">{config.title || 'Servicios'}</h2>
+        <h2 className={`${ts(config).title} font-black text-white mb-16 text-center tracking-tighter`}>{config.title || 'Servicios'}</h2>
         <div className={`grid grid-cols-1 ${cols} gap-8`}>
           {(config.cards || []).map((card: any, i: number) => (
             <div key={i} className="group p-10 rounded-[3rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500 shadow-2xl">
@@ -404,7 +439,7 @@ function PricingModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden border-t border-white/5`} style={{ backgroundColor: config.color || '#000' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
-        <h2 className="text-5xl sm:text-8xl font-black text-white mb-24 text-center tracking-tighter">{config.title || 'Tarifas'}</h2>
+        <h2 className={`${ts(config).title} font-black text-white mb-16 text-center tracking-tighter`}>{config.title || 'Tarifas'}</h2>
         <div className="space-y-24">
           {(config.categories || []).map((cat: any, ci: number) => (
             <div key={ci}>
@@ -435,7 +470,7 @@ function TeamModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
-        <h2 className="text-5xl sm:text-8xl font-black text-white mb-24 text-center tracking-tighter">{config.title || 'Equipo'}</h2>
+        <h2 className={`${ts(config).title} font-black text-white mb-16 text-center tracking-tighter`}>{config.title || 'Equipo'}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {(config.members || []).map((m: any, i: number) => (
             <div key={i} className="group p-10 bg-white/[0.02] border border-white/5 rounded-[3rem] text-center hover:bg-white/[0.05] transition-all">
@@ -492,7 +527,7 @@ function ContactModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#18181b' }}>
        <div className={`${mw} mx-auto relative z-10 grid lg:grid-cols-2 gap-24 items-center`}>
           <div>
-             <h2 className="text-6xl sm:text-9xl font-black text-white mb-12 tracking-tighter uppercase leading-none">Ven a <br/> vernos</h2>
+             <h2 className={`${ts(config).title} font-black text-white mb-12 tracking-tighter uppercase leading-none`}>{config.title || 'Contacto'}</h2>
              <div className="space-y-10">
                 {fullAddress && (
                   <div className="flex gap-6">
@@ -533,8 +568,8 @@ function CtaBannerModule({ config }: { config: any }) {
        <Deco type={config.decoration || 'blob'} />
        <div className={`${mw} mx-auto relative z-10 text-center space-y-8`}>
           {config.badgeText && <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/10">{config.badgeText}</span>}
-          <h2 className="text-5xl sm:text-8xl font-black text-white tracking-tighter leading-[0.9]">{config.title || '¡Acción inmediata!'}</h2>
-          <p className="text-white/60 text-xl font-medium max-w-2xl mx-auto">{config.subtitle}</p>
+          <h2 className={`${ts(config).title} font-black text-white tracking-tighter leading-[0.9]`}>{config.title || '¡Acción inmediata!'}</h2>
+          <p className={`text-white/60 ${ts(config).subtitle} font-medium max-w-2xl mx-auto`}>{config.subtitle}</p>
           <div className="flex justify-center pt-4">
              <Buttons buttons={config.buttons} config={config} />
           </div>
@@ -574,7 +609,7 @@ function TextColumnsModule({ config }: { config: any }) {
   return (
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#18181b' }}>
        <div className={`${mw} mx-auto relative z-10`}>
-          {config.title && <h2 className="text-4xl sm:text-6xl font-black text-white mb-16 tracking-tighter uppercase">{config.title}</h2>}
+          {config.title && <h2 className={`${ts(config).title} font-black text-white mb-16 tracking-tighter uppercase`}>{config.title}</h2>}
           <div className={`grid grid-cols-1 ${cols} gap-12 sm:gap-20`}>
              {(config.blocks || []).map((b: any, i: number) => (
                <div key={i} className="space-y-4">
@@ -602,8 +637,8 @@ function BookingModule({ config }: { config: any }) {
     <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#000' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto text-center`}>
-        <h2 className="text-5xl sm:text-8xl font-black text-white mb-6 tracking-tighter leading-none">{config.title || 'Reserva Online'}</h2>
-        {config.subtitle && <p className="text-zinc-500 text-xl font-medium mb-16 uppercase tracking-widest">{config.subtitle}</p>}
+        <h2 className={`${ts(config).title} font-black text-white mb-6 tracking-tighter leading-none`}>{config.title || 'Reserva Online'}</h2>
+         {config.subtitle && <p className={`text-zinc-500 ${ts(config).subtitle} font-medium mb-16 uppercase tracking-widest`}>{config.subtitle}</p>}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
            {config.showWhatsapp && whatsappPhone && (
              <a href={`https://wa.me/${whatsappPhone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:bg-green-600/10 hover:border-green-500/30 transition-all text-left relative overflow-hidden">
@@ -638,7 +673,7 @@ function ReviewsModule({ config }: { config: any }) {
   return (
     <section className={`${py} px-4 relative overflow-hidden bg-zinc-950 border-t border-white/5`}>
        <div className={`${mw} mx-auto relative z-10`}>
-          <h2 className="text-5xl sm:text-8xl font-black text-white mb-20 tracking-tighter text-center">{config.title || 'Reseñas'}</h2>
+          <h2 className={`${ts(config).title} font-black text-white mb-16 tracking-tighter text-center`}>{config.title || 'Reseñas'}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
              {(config.reviews || []).map((r: any, i: number) => (
                <div key={i} className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] flex flex-col gap-6">

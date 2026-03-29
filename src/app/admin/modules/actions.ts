@@ -327,9 +327,15 @@ export async function createModule(type: string, name: string, order: number) {
       }
       break
   }
+  // Unicidad: Si ya existe un navbar o footer activo, el nuevo nace desactivado
+  let shouldBeActive = true
+  if (type === 'navbar' || type === 'footer') {
+    const existing = await db.module.findFirst({ where: { type, isActive: true } })
+    if (existing) shouldBeActive = false
+  }
 
   await db.module.create({
-    data: { name, type, config: defaultConfig, isActive: true, order }
+    data: { name, type, config: defaultConfig, isActive: shouldBeActive, order }
   })
 
   revalidatePath("/admin/modules")

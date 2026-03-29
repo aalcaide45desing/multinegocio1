@@ -4,20 +4,21 @@ import { useState, useTransition } from "react"
 import { updateModuleConfig } from "../actions"
 import { useRouter } from "next/navigation"
 
-// ─── Sección reutilizable de Color + Decoración ───────────────────────────────
+// ─── Sección reutilizable de Color + Decoración + Tipografía ──────────────────
 function StyleSection({ config, onChange }: { config: any; onChange: (key: string, val: any) => void }) {
   return (
     <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
       <div className="flex justify-between items-center">
         <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Estilo y Tamaño</h4>
         <div className="flex gap-2">
-          <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase uppercase tracking-widest border border-purple-500/30">Personalización Pro</span>
+          <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase tracking-widest border border-purple-500/30">Personalización Pro</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-2">Color de fondo</label>
+          <label className="block text-sm font-medium text-zinc-400 mb-1">Color de fondo</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Define el color principal de esta sección. Haz clic en el cuadro para abrir el selector.</p>
           <div className="flex gap-3 items-center">
             <input type="color" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
               className="w-14 h-14 p-1 rounded-xl cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0 hover:scale-105 transition-transform" />
@@ -27,7 +28,8 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-2">Espaciado Vertical</label>
+          <label className="block text-sm font-medium text-zinc-400 mb-1">Espaciado Vertical</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Controla el espacio vacío (aire) por arriba y abajo de esta sección para separarla de las demás.</p>
           <select value={config.paddingY || 'md'} onChange={e => onChange('paddingY', e.target.value)}
             className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
             <option value="none">Sin Espaciado (0px)</option>
@@ -42,18 +44,20 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-2">Ancho de Contenido</label>
+          <label className="block text-sm font-medium text-zinc-400 mb-1">Ancho de Contenido</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Define cuánto espacio horizontal ocupa el contenido. "Pantalla Completa" elimina márgenes laterales.</p>
           <select value={config.maxWidth || 'md'} onChange={e => onChange('maxWidth', e.target.value)}
             className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-            <option value="sm">Estrecho (4xl)</option>
-            <option value="md">Estándar (6xl)</option>
-            <option value="lg">Ancho (7xl)</option>
-            <option value="xl">XL (Full wide)</option>
+            <option value="sm">Estrecho (Lectura cómoda)</option>
+            <option value="md">Estándar (Recomendado)</option>
+            <option value="lg">Ancho (Más contenido visible)</option>
+            <option value="xl">Extra ancho</option>
             <option value="full">Pantalla Completa</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-purple-400 mb-2">✨ Decoración de Fondo</label>
+          <label className="block text-sm font-medium text-purple-400 mb-1">✨ Decoración de Fondo</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Añade un efecto visual decorativo detrás del contenido para darle personalidad.</p>
           <select value={config.decoration || 'none'} onChange={e => onChange('decoration', e.target.value)}
             className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
             <option value="none">Ninguna (Liso)</option>
@@ -61,6 +65,51 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
             <option value="blob">Burbuja abstracta</option>
             <option value="grid">Cuadrícula técnica</option>
           </select>
+        </div>
+      </div>
+
+      {/* ── Tipografía ── */}
+      <div className="border-t border-zinc-800 pt-6">
+        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">🔤 Tipografía</h4>
+        <p className="text-[10px] text-zinc-600 mb-4">Controla el tamaño de las letras en esta sección. Los tamaños son responsive (se adaptan en móvil).</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño del Título</label>
+            <p className="text-[10px] text-zinc-600 mb-2">El encabezado principal de esta sección.</p>
+            <select value={config.titleSize || 'lg'} onChange={e => onChange('titleSize', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="xs">XS — Muy pequeño</option>
+              <option value="sm">S — Pequeño</option>
+              <option value="md">M — Mediano</option>
+              <option value="lg">L — Grande (Recomendado)</option>
+              <option value="xl">XL — Muy grande</option>
+              <option value="2xl">2XL — Impacto máximo</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño del Subtítulo</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Texto secundario debajo del título.</p>
+            <select value={config.subtitleSize || 'md'} onChange={e => onChange('subtitleSize', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="xs">XS — Muy pequeño</option>
+              <option value="sm">S — Pequeño</option>
+              <option value="md">M — Mediano (Recomendado)</option>
+              <option value="lg">L — Grande</option>
+              <option value="xl">XL — Muy grande</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño del Cuerpo</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Texto de párrafos, descripciones y contenido general.</p>
+            <select value={config.bodySize || 'md'} onChange={e => onChange('bodySize', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="xs">XS — Muy pequeño</option>
+              <option value="sm">S — Pequeño</option>
+              <option value="md">M — Mediano (Recomendado)</option>
+              <option value="lg">L — Grande</option>
+              <option value="xl">XL — Muy grande</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
