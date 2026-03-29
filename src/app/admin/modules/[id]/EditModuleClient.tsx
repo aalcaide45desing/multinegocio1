@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect, useRef } from "react"
 import { updateModuleConfig } from "../actions"
 import { useRouter } from "next/navigation"
 
@@ -113,82 +113,174 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
         </div>
       </div>
 
-      {/* ── Familia Tipográfica y Estilo ── */}
+      {/* ── Fuente y Estilo con Buscador + Preview ── */}
       <div className="border-t border-zinc-800 pt-6">
         <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">✍️ Fuente y Estilo</h4>
         <p className="text-[10px] text-zinc-600 mb-4">Elige la familia tipográfica y el peso visual del texto en esta sección.</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Familia de Fuente</label>
-            <p className="text-[10px] text-zinc-600 mb-2">El "tipo de letra" que se usará en títulos y textos.</p>
-            <select value={config.fontFamily || 'sans'} onChange={e => onChange('fontFamily', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="sans">Sans-Serif (Moderna, limpia)</option>
-              <option value="serif">Serif (Clásica, elegante)</option>
-              <option value="mono">Monoespaciada (Técnica)</option>
-              <option value="inter">Inter (Premium)</option>
-              <option value="playfair">Playfair Display (Lujo)</option>
-              <option value="montserrat">Montserrat (Geométrica)</option>
-              <option value="roboto">Roboto (Google estándar)</option>
-              <option value="outfit">Outfit (Moderna redondeada)</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Peso del Título</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Controla lo "grueso" o fino que se ve el título.</p>
-            <select value={config.titleWeight || 'black'} onChange={e => onChange('titleWeight', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="light">Light — Fino y elegante</option>
-              <option value="normal">Normal — Estándar</option>
-              <option value="semibold">Semibold — Semi-negrita</option>
-              <option value="bold">Bold — Negrita</option>
-              <option value="extrabold">Extrabold — Muy negrita</option>
-              <option value="black">Black — Ultra negrita (Recomendado)</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Estilo del Título</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Normal o inclinado (cursiva/itálica).</p>
-            <select value={config.titleStyle || 'normal'} onChange={e => onChange('titleStyle', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="normal">Normal (Recto)</option>
-              <option value="italic">Cursiva (Itálica)</option>
-            </select>
+        <div className="space-y-4">
+          <FontPicker value={config.fontFamily || ''} onChange={(v: string) => onChange('fontFamily', v)} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 mb-1">Peso del Título</label>
+              <p className="text-[10px] text-zinc-600 mb-2">Controla lo "grueso" o fino que se ve el título.</p>
+              <select value={config.titleWeight || 'black'} onChange={e => onChange('titleWeight', e.target.value)}
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+                <option value="light">Light — Fino y elegante</option>
+                <option value="normal">Normal — Estándar</option>
+                <option value="semibold">Semibold — Semi-negrita</option>
+                <option value="bold">Bold — Negrita</option>
+                <option value="extrabold">Extrabold — Muy negrita</option>
+                <option value="black">Black — Ultra negrita (Recomendado)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 mb-1">Estilo del Título</label>
+              <p className="text-[10px] text-zinc-600 mb-2">Normal o inclinado (cursiva/itálica).</p>
+              <select value={config.titleStyle || 'normal'} onChange={e => onChange('titleStyle', e.target.value)}
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+                <option value="normal">Normal (Recto)</option>
+                <option value="italic">Cursiva (Itálica)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Alto Mínimo del Módulo ── */}
+      {/* ── Dimensiones del Módulo ── */}
       <div className="border-t border-zinc-800 pt-6">
         <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">📐 Dimensiones del Módulo</h4>
-        <p className="text-[10px] text-zinc-600 mb-4">Controla la altura mínima de esta sección completa.</p>
+        <p className="text-[10px] text-zinc-600 mb-4">Controla la altura y separación de esta sección.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Alto Mínimo</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Define cuánto ocupa verticalmente esta sección como mínimo. "Auto" se adapta al contenido.</p>
-            <select value={config.minHeight || 'auto'} onChange={e => onChange('minHeight', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="auto">Auto (Se adapta al contenido)</option>
-              <option value="sm">Bajo (300px)</option>
-              <option value="md">Medio (500px)</option>
-              <option value="lg">Alto (700px)</option>
-              <option value="xl">Muy alto (100% pantalla)</option>
-            </select>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Alto Mínimo (px)</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Escribe la altura mínima en píxeles. Déjalo vacío o en 0 para que se adapte al contenido.</p>
+            <div className="flex gap-3 items-center">
+              <input type="number" min="0" step="10" value={config.minHeightPx || ''} 
+                onChange={e => onChange('minHeightPx', e.target.value ? parseInt(e.target.value) : 0)}
+                placeholder="Ej: 500" 
+                className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
+              <span className="text-zinc-600 text-xs font-bold">px</span>
+            </div>
           </div>
           <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Separación Inferior Extra</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Añade espacio extra entre este módulo y el siguiente. Útil para dar "aire" visual.</p>
-            <select value={config.marginBottom || 'none'} onChange={e => onChange('marginBottom', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="none">Sin separación extra</option>
-              <option value="sm">Pequeña (16px)</option>
-              <option value="md">Media (32px)</option>
-              <option value="lg">Grande (64px)</option>
-              <option value="xl">Muy grande (96px)</option>
-            </select>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Separación Inferior Extra (px)</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Espacio extra entre este módulo y el siguiente en píxeles. Déjalo en 0 para sin espacio extra.</p>
+            <div className="flex gap-3 items-center">
+              <input type="number" min="0" step="4" value={config.marginBottomPx || ''} 
+                onChange={e => onChange('marginBottomPx', e.target.value ? parseInt(e.target.value) : 0)}
+                placeholder="Ej: 32" 
+                className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
+              <span className="text-zinc-600 text-xs font-bold">px</span>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ─── Google Fonts Picker con Buscador y Preview ───────────────────────────────
+const GOOGLE_FONTS = [
+  'Inter','Roboto','Open Sans','Montserrat','Lato','Poppins','Raleway','Oswald',
+  'Playfair Display','Merriweather','Source Sans 3','Nunito','Ubuntu','PT Sans',
+  'Rubik','Work Sans','Outfit','Noto Sans','Mulish','Quicksand','DM Sans',
+  'Barlow','Josefin Sans','Cabin','Exo 2','Karla','Libre Baskerville',
+  'Fira Sans','Manrope','Space Grotesk','Sora','Archivo','Crimson Text',
+  'Inconsolata','Bitter','Cormorant Garamond','EB Garamond','Spectral',
+  'Vollkorn','Lora','IBM Plex Sans','IBM Plex Serif','IBM Plex Mono',
+  'JetBrains Mono','Fira Code','Source Code Pro','Bebas Neue','Anton',
+  'Permanent Marker','Pacifico','Dancing Script','Lobster','Great Vibes',
+  'Cinzel','Archivo Black','Abril Fatface','Alfa Slab One','Righteous',
+  'Comfortaa','Satisfy','Cookie','Sacramento','Courgette','Kalam',
+  'Patrick Hand','Caveat','Indie Flower','Shadows Into Light',
+  'Amatic SC','Press Start 2P','Silkscreen','Pixelify Sans',
+  'Orbitron','Rajdhani','Teko','Saira','Barlow Condensed',
+  'Fjalla One','Yanone Kaffeesatz','Titillium Web','Prompt',
+  'Noto Serif','Zilla Slab','Alegreya','Cardo','Old Standard TT',
+  'Jost','Plus Jakarta Sans','Lexend','Albert Sans','Geist',
+  'Urbanist','Figtree','Onest','General Sans'
+]
+
+const loadedFonts = new Set<string>()
+function loadGoogleFont(name: string) {
+  if (loadedFonts.has(name) || !name) return
+  loadedFonts.add(name)
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@400;700;900&display=swap`
+  document.head.appendChild(link)
+}
+
+function FontPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Cerrar al hacer clic fuera
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  // Cargar la fuente activa al montar
+  useEffect(() => { if (value) loadGoogleFont(value) }, [value])
+
+  const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(search.toLowerCase()))
+
+  return (
+    <div ref={ref} className="relative">
+      <label className="block text-xs font-bold text-zinc-400 mb-1">Familia de Fuente</label>
+      <p className="text-[10px] text-zinc-600 mb-2">Haz clic para buscar entre 80+ fuentes de Google Fonts con vista previa.</p>
+      
+      {/* Botón principal */}
+      <button type="button" onClick={() => setOpen(!open)}
+        className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold text-left flex items-center justify-between hover:border-zinc-600 transition-colors">
+        <span style={value ? { fontFamily: `'${value}', sans-serif` } : undefined}>
+          {value || 'Sin fuente personalizada (usa la del sistema)'}
+        </span>
+        <span className="text-zinc-600 text-lg">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Panel desplegable */}
+      {open && (
+        <div className="absolute z-50 left-0 right-0 mt-2 bg-zinc-950 border border-zinc-700 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden" style={{ maxHeight: '400px' }}>
+          {/* Buscador */}
+          <div className="sticky top-0 bg-zinc-950 p-3 border-b border-zinc-800 z-10">
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)} autoFocus
+              placeholder="🔍 Buscar fuente..." 
+              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white text-sm focus:border-purple-500 outline-none" />
+          </div>
+          {/* Opción sin fuente */}
+          <button type="button" onClick={() => { onChange(''); setOpen(false) }}
+            className={`w-full px-4 py-3 text-left hover:bg-zinc-800 transition-colors text-sm ${!value ? 'bg-purple-900/30 text-purple-400' : 'text-zinc-400'}`}>
+            Sin fuente personalizada (sistema)
+          </button>
+          {/* Lista con scroll */}
+          <div className="overflow-y-auto" style={{ maxHeight: '320px' }}>
+            {filtered.map(font => {
+              loadGoogleFont(font)
+              const isSelected = value === font
+              return (
+                <button key={font} type="button" 
+                  onClick={() => { onChange(font); setOpen(false) }}
+                  className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-zinc-800 transition-colors group ${isSelected ? 'bg-purple-900/30' : ''}`}>
+                  <div>
+                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-0.5">{font}</p>
+                    <p className="text-white text-lg" style={{ fontFamily: `'${font}', sans-serif` }}>
+                      El veloz murciélago hindú 123
+                    </p>
+                  </div>
+                  {isSelected && <span className="text-purple-400 font-black text-xs">✓ ACTIVA</span>}
+                </button>
+              )
+            })}
+            {filtered.length === 0 && (
+              <p className="text-center text-zinc-600 py-8 text-sm">No se encontraron fuentes con "{search}"</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

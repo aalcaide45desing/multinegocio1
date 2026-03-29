@@ -95,17 +95,6 @@ const BODY_SIZE: Record<string, string> = {
   xl: 'text-lg sm:text-xl',
 }
 
-const FONT_FAMILY: Record<string, string> = {
-  sans: 'font-sans',
-  serif: 'font-serif',
-  mono: 'font-mono',
-  inter: 'font-sans', // Inter ya es el sans por defecto de Next.js
-  playfair: 'font-serif',
-  montserrat: 'font-sans',
-  roboto: 'font-sans',
-  outfit: 'font-sans',
-}
-
 const FONT_WEIGHT: Record<string, string> = {
   light: 'font-light',
   normal: 'font-normal',
@@ -115,32 +104,17 @@ const FONT_WEIGHT: Record<string, string> = {
   black: 'font-black',
 }
 
-const MIN_HEIGHT: Record<string, string> = {
-  auto: '',
-  sm: 'min-h-[300px]',
-  md: 'min-h-[500px]',
-  lg: 'min-h-[700px]',
-  xl: 'min-h-screen',
-}
-
-const MARGIN_BOTTOM: Record<string, string> = {
-  none: '',
-  sm: 'mb-4',
-  md: 'mb-8',
-  lg: 'mb-16',
-  xl: 'mb-24',
-}
-
 function ts(config: any) {
   return {
     title: TITLE_SIZE[config.titleSize] || TITLE_SIZE.lg,
     subtitle: SUBTITLE_SIZE[config.subtitleSize] || SUBTITLE_SIZE.md,
     body: BODY_SIZE[config.bodySize] || BODY_SIZE.md,
-    family: FONT_FAMILY[config.fontFamily] || FONT_FAMILY.sans,
     weight: FONT_WEIGHT[config.titleWeight] || FONT_WEIGHT.black,
     style: config.titleStyle === 'italic' ? 'italic' : '',
-    minH: MIN_HEIGHT[config.minHeight] || '',
-    mb: MARGIN_BOTTOM[config.marginBottom] || '',
+    // Estos se aplican por inline style en el wrapper
+    fontFamily: config.fontFamily || '',
+    minH: config.minHeightPx ? `${config.minHeightPx}px` : '',
+    mb: config.marginBottomPx ? `${config.marginBottomPx}px` : '',
   }
 }
 
@@ -863,15 +837,27 @@ export default async function HomePage() {
   const renderWrapped = (mod: any) => {
     const c = mod.config as any
     const t = ts(c)
-    const wrapClasses = [t.family, t.minH, t.mb].filter(Boolean).join(' ')
-    return wrapClasses 
-      ? <div key={mod.id + '-wrap'} className={wrapClasses}>{render(mod)}</div>
+    const wrapStyle: React.CSSProperties = {}
+    if (t.fontFamily) wrapStyle.fontFamily = `'${t.fontFamily}', sans-serif`
+    if (t.minH) wrapStyle.minHeight = t.minH
+    if (t.mb) wrapStyle.marginBottom = t.mb
+    const hasStyle = Object.keys(wrapStyle).length > 0
+    return hasStyle
+      ? <div key={mod.id + '-wrap'} style={wrapStyle}>{render(mod)}</div>
       : render(mod)
   }
+
+  // Recopilar todas las Google Fonts usadas por los módulos
+  const googleFonts = new Set<string>()
+  body.forEach(mod => { const ff = (mod.config as any)?.fontFamily; if (ff) googleFonts.add(ff) })
 
   return (
     <main className="min-h-screen selection:bg-purple-500 selection:text-white" style={{ backgroundColor: background }}>
       {globalStyles}
+      {/* Cargar Google Fonts usadas por los módulos */}
+      {Array.from(googleFonts).map(font => (
+        <link key={font} rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@300;400;600;700;800;900&display=swap`} />
+      ))}
       {announcement && <AnnouncementModule config={announcement.config as any} />}
       {navbar && <NavbarModule config={{ ...(navbar.config as any), _global: settings }} />}
       {body.map(renderWrapped)}
