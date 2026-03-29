@@ -152,8 +152,8 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
         <p className="text-[10px] text-zinc-600 mb-4">Controla la altura y separación de esta sección.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Alto Mínimo (px)</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Escribe la altura mínima en píxeles. Déjalo vacío o en 0 para que se adapte al contenido.</p>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Alto del Módulo (px)</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Fija la altura exacta de esta sección en píxeles. Déjalo vacío o en 0 para que se adapte al contenido. El contenido se centrará verticalmente.</p>
             <div className="flex gap-3 items-center">
               <input type="number" min="0" step="10" value={config.minHeightPx || ''} 
                 onChange={e => onChange('minHeightPx', e.target.value ? parseInt(e.target.value) : 0)}

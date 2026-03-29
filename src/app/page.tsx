@@ -113,7 +113,7 @@ function ts(config: any) {
     style: config.titleStyle === 'italic' ? 'italic' : '',
     // Estos se aplican por inline style en el wrapper
     fontFamily: config.fontFamily || '',
-    minH: config.minHeightPx ? `${config.minHeightPx}px` : '',
+    heightPx: config.minHeightPx || 0,
     mb: config.marginBottomPx ? `${config.marginBottomPx}px` : '',
   }
 }
@@ -833,13 +833,18 @@ export default async function HomePage() {
     }
   }
 
-  // Wrapper que aplica familia tipográfica, alto mínimo y separación
+  // Wrapper que aplica familia tipográfica, altura fija y separación
   const renderWrapped = (mod: any) => {
     const c = mod.config as any
     const t = ts(c)
     const wrapStyle: React.CSSProperties = {}
     if (t.fontFamily) wrapStyle.fontFamily = `'${t.fontFamily}', sans-serif`
-    if (t.minH) wrapStyle.minHeight = t.minH
+    if (t.heightPx > 0) {
+      wrapStyle.height = `${t.heightPx}px`
+      wrapStyle.overflow = 'hidden'
+      wrapStyle.display = 'flex'
+      wrapStyle.alignItems = 'center'
+    }
     if (t.mb) wrapStyle.marginBottom = t.mb
     const hasStyle = Object.keys(wrapStyle).length > 0
     return hasStyle
