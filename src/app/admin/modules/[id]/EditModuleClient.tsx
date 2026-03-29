@@ -112,6 +112,83 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
           </div>
         </div>
       </div>
+
+      {/* ── Familia Tipográfica y Estilo ── */}
+      <div className="border-t border-zinc-800 pt-6">
+        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">✍️ Fuente y Estilo</h4>
+        <p className="text-[10px] text-zinc-600 mb-4">Elige la familia tipográfica y el peso visual del texto en esta sección.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Familia de Fuente</label>
+            <p className="text-[10px] text-zinc-600 mb-2">El "tipo de letra" que se usará en títulos y textos.</p>
+            <select value={config.fontFamily || 'sans'} onChange={e => onChange('fontFamily', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="sans">Sans-Serif (Moderna, limpia)</option>
+              <option value="serif">Serif (Clásica, elegante)</option>
+              <option value="mono">Monoespaciada (Técnica)</option>
+              <option value="inter">Inter (Premium)</option>
+              <option value="playfair">Playfair Display (Lujo)</option>
+              <option value="montserrat">Montserrat (Geométrica)</option>
+              <option value="roboto">Roboto (Google estándar)</option>
+              <option value="outfit">Outfit (Moderna redondeada)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Peso del Título</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Controla lo "grueso" o fino que se ve el título.</p>
+            <select value={config.titleWeight || 'black'} onChange={e => onChange('titleWeight', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="light">Light — Fino y elegante</option>
+              <option value="normal">Normal — Estándar</option>
+              <option value="semibold">Semibold — Semi-negrita</option>
+              <option value="bold">Bold — Negrita</option>
+              <option value="extrabold">Extrabold — Muy negrita</option>
+              <option value="black">Black — Ultra negrita (Recomendado)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Estilo del Título</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Normal o inclinado (cursiva/itálica).</p>
+            <select value={config.titleStyle || 'normal'} onChange={e => onChange('titleStyle', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="normal">Normal (Recto)</option>
+              <option value="italic">Cursiva (Itálica)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Alto Mínimo del Módulo ── */}
+      <div className="border-t border-zinc-800 pt-6">
+        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">📐 Dimensiones del Módulo</h4>
+        <p className="text-[10px] text-zinc-600 mb-4">Controla la altura mínima de esta sección completa.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Alto Mínimo</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Define cuánto ocupa verticalmente esta sección como mínimo. "Auto" se adapta al contenido.</p>
+            <select value={config.minHeight || 'auto'} onChange={e => onChange('minHeight', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="auto">Auto (Se adapta al contenido)</option>
+              <option value="sm">Bajo (300px)</option>
+              <option value="md">Medio (500px)</option>
+              <option value="lg">Alto (700px)</option>
+              <option value="xl">Muy alto (100% pantalla)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">Separación Inferior Extra</label>
+            <p className="text-[10px] text-zinc-600 mb-2">Añade espacio extra entre este módulo y el siguiente. Útil para dar "aire" visual.</p>
+            <select value={config.marginBottom || 'none'} onChange={e => onChange('marginBottom', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+              <option value="none">Sin separación extra</option>
+              <option value="sm">Pequeña (16px)</option>
+              <option value="md">Media (32px)</option>
+              <option value="lg">Grande (64px)</option>
+              <option value="xl">Muy grande (96px)</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
