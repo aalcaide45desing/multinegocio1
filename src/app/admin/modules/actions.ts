@@ -2,6 +2,15 @@
 
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
+
+async function verifyAdmin() {
+  const session = await getServerSession(authOptions)
+  if (!session || session.user.role !== "ADMIN") {
+    throw new Error("Acceso denegado: Se requiere ser Administrador.")
+  }
+}
 
 async function triggerVercelRebuild() {
   const webhookUrl = process.env.VERCEL_DEPLOY_WEBHOOK_URL;
@@ -15,12 +24,14 @@ async function triggerVercelRebuild() {
 }
 
 export async function toggleModuleStatus(id: string, currentStatus: boolean) {
+  await verifyAdmin()
   await db.module.update({ where: { id }, data: { isActive: !currentStatus } })
   revalidatePath("/admin/modules")
   revalidatePath("/")
 }
 
 export async function createModule(type: string, name: string, order: number) {
+  await verifyAdmin()
   let defaultConfig: any = {}
 
   switch (type) {
@@ -326,12 +337,14 @@ export async function createModule(type: string, name: string, order: number) {
 }
 
 export async function deleteModule(id: string) {
+  await verifyAdmin()
   await db.module.delete({ where: { id } })
   revalidatePath("/admin/modules")
   revalidatePath("/")
 }
 
 export async function updateModuleConfig(id: string, newConfig: any) {
+  await verifyAdmin()
   await db.module.update({ where: { id }, data: { config: newConfig } })
   revalidatePath("/admin/modules")
   revalidatePath(`/admin/modules/${id}`)
@@ -340,6 +353,7 @@ export async function updateModuleConfig(id: string, newConfig: any) {
 }
 
 export async function swapModuleOrder(idA: string, orderA: number, idB: string, orderB: number) {
+  await verifyAdmin()
   await db.$transaction([
     db.module.update({ where: { id: idA }, data: { order: orderB } }),
     db.module.update({ where: { id: idB }, data: { order: orderA } }),

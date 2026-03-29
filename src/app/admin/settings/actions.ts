@@ -2,6 +2,15 @@
 
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
+
+async function verifyAdmin() {
+  const session = await getServerSession(authOptions)
+  if (!session || session.user.role !== "ADMIN") {
+    throw new Error("Acceso denegado: Se requiere ser Administrador.")
+  }
+}
 
 export async function getSettings() {
   try {
@@ -47,6 +56,7 @@ export async function getSettings() {
 }
 
 export async function updateSettings(data: any) {
+  await verifyAdmin()
   try {
     const settings = await (db as any).settings?.upsert({
       where: { id: "global" },
@@ -61,3 +71,4 @@ export async function updateSettings(data: any) {
     return null
   }
 }
+
