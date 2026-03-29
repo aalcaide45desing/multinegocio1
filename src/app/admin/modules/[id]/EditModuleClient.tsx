@@ -155,8 +155,8 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
             <label className="block text-xs font-bold text-zinc-400 mb-1">Alto del Módulo (px)</label>
             <p className="text-[10px] text-zinc-600 mb-2">Fija la altura exacta de esta sección en píxeles. Déjalo vacío o en 0 para que se adapte al contenido. El contenido se centrará verticalmente.</p>
             <div className="flex gap-3 items-center">
-              <input type="number" min="0" step="10" value={config.minHeightPx || ''} 
-                onChange={e => onChange('minHeightPx', e.target.value ? parseInt(e.target.value) : 0)}
+              <input type="number" min="0" step="10" value={config.minHeightPx ?? ''} 
+                onChange={e => onChange('minHeightPx', e.target.value === '' ? 0 : parseInt(e.target.value))}
                 placeholder="Ej: 500" 
                 className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
               <span className="text-zinc-600 text-xs font-bold">px</span>
@@ -166,8 +166,8 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
             <label className="block text-xs font-bold text-zinc-400 mb-1">Separación Inferior Extra (px)</label>
             <p className="text-[10px] text-zinc-600 mb-2">Espacio extra entre este módulo y el siguiente en píxeles. Déjalo en 0 para sin espacio extra.</p>
             <div className="flex gap-3 items-center">
-              <input type="number" min="0" step="4" value={config.marginBottomPx || ''} 
-                onChange={e => onChange('marginBottomPx', e.target.value ? parseInt(e.target.value) : 0)}
+              <input type="number" min="0" step="4" value={config.marginBottomPx ?? ''} 
+                onChange={e => onChange('marginBottomPx', e.target.value === '' ? 0 : parseInt(e.target.value))}
                 placeholder="Ej: 32" 
                 className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
               <span className="text-zinc-600 text-xs font-bold">px</span>

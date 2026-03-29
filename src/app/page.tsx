@@ -842,8 +842,6 @@ export default async function HomePage() {
     if (t.heightPx > 0) {
       wrapStyle.height = `${t.heightPx}px`
       wrapStyle.overflow = 'hidden'
-      wrapStyle.display = 'flex'
-      wrapStyle.alignItems = 'center'
     }
     if (t.mb) wrapStyle.marginBottom = t.mb
     const hasStyle = Object.keys(wrapStyle).length > 0
