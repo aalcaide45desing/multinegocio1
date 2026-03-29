@@ -8,33 +8,59 @@ import { useRouter } from "next/navigation"
 function StyleSection({ config, onChange }: { config: any; onChange: (key: string, val: any) => void }) {
   return (
     <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
-      <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Estilo Visual</h4>
-
-      <div>
-        <label className="block text-sm font-medium text-zinc-400 mb-2">Color de fondo</label>
-        <div className="flex gap-3 items-center">
-          <input type="color" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
-            className="w-14 h-14 p-1 rounded-xl cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0 hover:scale-105 transition-transform" />
-          <input type="text" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
-            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white uppercase font-mono tracking-widest" />
+      <div className="flex justify-between items-center">
+        <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Estilo y Tamaño</h4>
+        <div className="flex gap-2">
+          <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase uppercase tracking-widest border border-purple-500/30">Personalización Pro</span>
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-purple-400 mb-3">✨ Decoración de Fondo</label>
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { value: 'none',  label: 'Ninguna',    desc: 'Liso y minimalista' },
-            { value: 'waves', label: 'Olas',        desc: 'Transición fluida' },
-            { value: 'blob',  label: 'Burbuja',     desc: 'Forma abstracta' },
-            { value: 'grid',  label: 'Cuadrícula',  desc: 'Patrón tecnológico' },
-          ].map(d => (
-            <label key={d.value} className={`cursor-pointer p-3 border rounded-xl transition-all ${config.decoration === d.value || (!config.decoration && d.value === 'none') ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}>
-              <input type="radio" value={d.value} checked={config.decoration === d.value || (!config.decoration && d.value === 'none')} onChange={() => onChange('decoration', d.value)} className="sr-only" />
-              <span className="font-semibold text-white text-sm block">{d.label}</span>
-              <span className="text-xs text-zinc-500">{d.desc}</span>
-            </label>
-          ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-zinc-400 mb-2">Color de fondo</label>
+          <div className="flex gap-3 items-center">
+            <input type="color" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
+              className="w-14 h-14 p-1 rounded-xl cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0 hover:scale-105 transition-transform" />
+            <input type="text" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white uppercase font-mono tracking-widest text-xs" />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-zinc-400 mb-2">Espaciado Vertical</label>
+          <select value={config.paddingY || 'md'} onChange={e => onChange('paddingY', e.target.value)}
+            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+            <option value="none">Sin Espaciado (0px)</option>
+            <option value="xs">Mínimo (Muy estrecho)</option>
+            <option value="sm">Pequeño (Compacto)</option>
+            <option value="md">Normal (Equilibrado)</option>
+            <option value="lg">Grande (Espacioso)</option>
+            <option value="xl">Gigante (Hero-style)</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-zinc-400 mb-2">Ancho de Contenido</label>
+          <select value={config.maxWidth || 'md'} onChange={e => onChange('maxWidth', e.target.value)}
+            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+            <option value="sm">Estrecho (4xl)</option>
+            <option value="md">Estándar (6xl)</option>
+            <option value="lg">Ancho (7xl)</option>
+            <option value="xl">XL (Full wide)</option>
+            <option value="full">Pantalla Completa</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-purple-400 mb-2">✨ Decoración de Fondo</label>
+          <select value={config.decoration || 'none'} onChange={e => onChange('decoration', e.target.value)}
+            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+            <option value="none">Ninguna (Liso)</option>
+            <option value="waves">Olas suaves</option>
+            <option value="blob">Burbuja abstracta</option>
+            <option value="grid">Cuadrícula técnica</option>
+          </select>
         </div>
       </div>
     </div>
@@ -57,725 +83,1005 @@ function useArrayHelpers(config: any, setConfig: React.Dispatch<React.SetStateAc
     newArray.splice(index, 1)
     setConfig((prev: any) => ({ ...prev, [arrayName]: newArray }))
   }
-  return { handleArrayChange, addArrayItem, removeArrayItem }
+
+  const handleDayIntervalChange = (dayIdx: number, subIdx: number, key: string, val: any) => {
+    const days = [...(config.days || [])]
+    const intervals = [...(days[dayIdx].intervals || [])]
+    intervals[subIdx] = { ...intervals[subIdx], [key]: val }
+    days[dayIdx].intervals = intervals
+    setConfig((prev: any) => ({ ...prev, days }))
+  }
+
+  const addDayInterval = (dayIdx: number) => {
+    const days = [...(config.days || [])]
+    const existing = days[dayIdx].intervals || []
+    days[dayIdx].intervals = [...existing, { open: '09:00', close: '14:00' }]
+    setConfig((prev: any) => ({ ...prev, days }))
+  }
+
+  const removeDayInterval = (dayIdx: number, subIdx: number) => {
+    const days = [...(config.days || [])]
+    const intervals = [...(days[dayIdx].intervals || [])]
+    intervals.splice(subIdx, 1)
+    days[dayIdx].intervals = intervals
+    setConfig((prev: any) => ({ ...prev, days }))
+  }
+
+  return { handleArrayChange, addArrayItem, removeArrayItem, handleDayIntervalChange, addDayInterval, removeDayInterval }
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
-export default function EditModuleClient({ mod }: { mod: any }) {
+export default function EditModuleClient({ mod, initialSettings }: { mod: any; initialSettings?: any }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [config, setConfig] = useState<any>(mod.config || {})
-
-  const { handleArrayChange, addArrayItem, removeArrayItem } = useArrayHelpers(config, setConfig)
+ 
+  const { handleArrayChange, addArrayItem, removeArrayItem, handleDayIntervalChange, addDayInterval, removeDayInterval } = useArrayHelpers(config, setConfig)
   const set = (key: string, val: any) => setConfig((prev: any) => ({ ...prev, [key]: val }))
 
   const handleSave = () => {
     startTransition(async () => {
       await updateModuleConfig(mod.id, config)
       router.refresh()
-      alert("¡Cambios guardados! Refresca la web pública para verlos.")
+      alert("¡Cambios guardados con éxito! 🎉 Vercel está ahora optimizando y descargando tus imágenes (El Rebuild tardará ~1 minuto en vivo).")
     })
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-32">
 
       {/* ══════════════════════════════════════════════
           NAVBAR (Cabecera)
       ══════════════════════════════════════════════ */}
       {mod.type === 'navbar' && (
-        <>
-          {/* Marca */}
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🏷️ Marca / Logo</h4>
-            <div className="flex items-center gap-4">
-              <label className="relative inline-flex items-center cursor-pointer gap-3">
-                <input type="checkbox" className="sr-only peer" checked={config.showLogo ?? true} onChange={e => set('showLogo', e.target.checked)} />
-                <div className="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
-                <span className="text-sm text-zinc-300">Mostrar Nombre / Logo</span>
-              </label>
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Texto del logotipo</label>
-              <input type="text" value={config.logoText || ''} onChange={e => set('logoText', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-2">Tamaño del logo</label>
-              <div className="flex gap-3">
-                {['sm','md','lg'].map(s => (
-                  <label key={s} className={`flex-1 text-center cursor-pointer py-2 border rounded-xl transition-all text-sm font-semibold ${config.logoSize === s ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-zinc-800 text-zinc-400 hover:border-zinc-600'}`}>
-                    <input type="radio" value={s} checked={config.logoSize === s} onChange={() => set('logoSize', s)} className="sr-only" />
-                    {s === 'sm' ? 'Pequeño' : s === 'md' ? 'Mediano' : 'Grande'}
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Menú de navegación */}
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <div className="flex justify-between items-center">
-              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🔗 Menú de Navegación</h4>
-              <button onClick={() => addArrayItem('links', { label: 'Página Nueva', url: '#', openNewTab: false })}
-                className="text-xs bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1.5 px-3 rounded-lg transition">
-                + Añadir Enlace
-              </button>
-            </div>
-            <div className="space-y-3">
-              {(config.links || []).map((link: any, idx: number) => (
-                <div key={link.id || idx} className="p-4 bg-zinc-900 border border-zinc-700/50 rounded-xl relative group">
-                  <button onClick={() => removeArrayItem('links', idx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <label className="block text-xs text-zinc-500 mb-1">Texto visible</label>
-                      <input type="text" value={link.label || ''} onChange={e => handleArrayChange('links', idx, 'label', e.target.value)} placeholder="Inicio" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-zinc-500 mb-1">URL del enlace</label>
-                      <input type="text" value={link.url || ''} onChange={e => handleArrayChange('links', idx, 'url', e.target.value)} placeholder="#inicio o /pagina" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
-                    </div>
-                  </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={link.openNewTab ?? false} onChange={e => handleArrayChange('links', idx, 'openNewTab', e.target.checked)} className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 accent-purple-500" />
-                    <span className="text-xs text-zinc-400">Abrir en pestaña nueva</span>
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Botón CTA */}
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+        <div className="space-y-6">
+          <div className="p-6 bg-purple-900/10 border border-purple-500/30 rounded-2xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🚀 Botón de Acción (CTA)</h4>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" checked={config.showCta ?? true} onChange={e => set('showCta', e.target.checked)} />
-                <div className="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
-              </label>
-            </div>
-            {(config.showCta ?? true) && (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-zinc-500 mb-1">Texto del botón</label>
-                    <input type="text" value={config.ctaText || ''} onChange={e => set('ctaText', e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-zinc-500 mb-1">URL destino</label>
-                    <input type="text" value={config.ctaUrl || ''} onChange={e => set('ctaUrl', e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs text-zinc-500 mb-2">Estilo del botón</label>
-                  <div className="flex gap-3">
-                    {[
-                      { val: 'filled',   label: 'Sólido (Relleno)' },
-                      { val: 'outlined', label: 'Contorno' },
-                      { val: 'ghost',    label: 'Fantasma' },
-                    ].map(s => (
-                      <label key={s.val} className={`flex-1 text-center cursor-pointer py-2 border rounded-xl transition-all text-xs font-semibold ${config.ctaStyle === s.val ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-zinc-800 text-zinc-400 hover:border-zinc-600'}`}>
-                        <input type="radio" value={s.val} checked={config.ctaStyle === s.val} onChange={() => set('ctaStyle', s.val)} className="sr-only" />
-                        {s.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Estilo visual de la barra */}
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Apariencia de la Barra</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-zinc-500 mb-2">Color de fondo</label>
-                <div className="flex gap-2 items-center">
-                  <input type="color" value={config.bgColor || '#000000'} onChange={e => set('bgColor', e.target.value)} className="w-11 h-11 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 hover:scale-105 transition-transform" />
-                  <input type="text" value={config.bgColor || '#000000'} onChange={e => set('bgColor', e.target.value)} className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white font-mono text-xs uppercase" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-500 mb-2">Color del texto / enlaces</label>
-                <div className="flex gap-2 items-center">
-                  <input type="color" value={config.textColor || '#ffffff'} onChange={e => set('textColor', e.target.value)} className="w-11 h-11 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 hover:scale-105 transition-transform" />
-                  <input type="text" value={config.textColor || '#ffffff'} onChange={e => set('textColor', e.target.value)} className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white font-mono text-xs uppercase" />
-                </div>
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-2">Transparencia / Fondo</label>
-              <div className="flex gap-3">
-                {[
-                  { val: 'solid',       label: 'Sólido',      desc: 'Color puro' },
-                  { val: 'blur',        label: 'Cristal',     desc: 'Blur + transparente' },
-                  { val: 'transparent', label: 'Transparente', desc: 'Sin fondo visible' },
-                ].map(o => (
-                  <label key={o.val} className={`flex-1 cursor-pointer p-3 border rounded-xl transition-all ${config.bgOpacity === o.val ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}>
-                    <input type="radio" value={o.val} checked={config.bgOpacity === o.val} onChange={() => set('bgOpacity', o.val)} className="sr-only" />
-                    <span className="font-semibold text-white text-xs block">{o.label}</span>
-                    <span className="text-[10px] text-zinc-500">{o.desc}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center gap-8">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" checked={config.showBorder ?? false} onChange={e => set('showBorder', e.target.checked)} className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 accent-purple-500" />
-                <span className="text-sm text-zinc-300">Mostrar borde inferior</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Posición y Layout */}
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">⚙️ Comportamiento</h4>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-2">Posición al hacer scroll</label>
-              <div className="flex gap-3">
-                {[
-                  { val: 'sticky',   label: 'Pegado (Sticky)', desc: 'Sigue al usuario al bajar' },
-                  { val: 'fixed',    label: 'Fijo (Fixed)',     desc: 'Siempre visible encima' },
-                  { val: 'relative', label: 'Normal',          desc: 'Desaparece al bajar' },
-                ].map(p => (
-                  <label key={p.val} className={`flex-1 cursor-pointer p-3 border rounded-xl transition-all ${config.position === p.val ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}>
-                    <input type="radio" value={p.val} checked={config.position === p.val} onChange={() => set('position', p.val)} className="sr-only" />
-                    <span className="font-semibold text-white text-xs block">{p.label}</span>
-                    <span className="text-[10px] text-zinc-500">{p.desc}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-2">Distribución del menú</label>
-              <div className="flex gap-3">
-                {[
-                  { val: 'standard', label: 'Estándar',   desc: 'Logo izq · Links centro · CTA der' },
-                  { val: 'centered', label: 'Centrado',   desc: 'Todo centrado' },
-                  { val: 'minimal',  label: 'Minimal',    desc: 'Solo logo + CTA' },
-                ].map(l => (
-                  <label key={l.val} className={`flex-1 cursor-pointer p-3 border rounded-xl transition-all ${config.layout === l.val ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}>
-                    <input type="radio" value={l.val} checked={config.layout === l.val} onChange={() => set('layout', l.val)} className="sr-only" />
-                    <span className="font-semibold text-white text-xs block">{l.label}</span>
-                    <span className="text-[10px] text-zinc-500">{l.desc}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-          {/* Marca / Brand Global */}
-          <div className="p-6 bg-purple-900/10 border border-purple-500/30 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold text-purple-400 text-sm uppercase tracking-widest flex items-center gap-2">🌈 Marca Global (Tema)</h4>
+              <h4 className="font-bold text-purple-400 text-sm uppercase tracking-widest flex items-center gap-2">🌈 Marca Global (Estilo Maestro)</h4>
               <label className="relative inline-flex items-center cursor-pointer gap-2">
                 <input type="checkbox" className="sr-only peer" checked={config.brand?.applyGlobal ?? false} 
                   onChange={e => set('brand', { ...(config.brand || {}), applyGlobal: e.target.checked })} />
-                <div className="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
-                <span className="text-[10px] text-zinc-400 uppercase font-black">Aplicar a TODO</span>
+                <div className="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                <span className="text-[10px] text-zinc-400 uppercase font-black">Aplicar a toda la web</span>
               </label>
             </div>
-            <p className="text-[11px] text-zinc-500">Si activas esto, todos los módulos ignorarán sus colores propios y usarán estos.</p>
-            <div className="grid grid-cols-2 gap-4">
-              {['primary', 'secondary', 'accent', 'background'].map(key => (
-                <div key={key}>
-                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-bold">{key}</label>
-                  <div className="flex gap-2">
-                    <input type="color" value={config.brand?.[key] || '#000'} 
-                      onChange={e => set('brand', { ...(config.brand || {}), [key]: e.target.value })} 
-                      className="w-8 h-8 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800" />
-                    <input type="text" value={config.brand?.[key] || '#000'} 
-                      onChange={e => set('brand', { ...(config.brand || {}), [key]: e.target.value })} 
-                      className="flex-1 px-2 py-1 bg-zinc-950 border border-zinc-800 rounded-lg text-white font-mono text-[10px] uppercase" />
+            <p className="text-[11px] text-zinc-500">Define los colores principales de tu marca aquí. Si activas "Aplicar a toda la web", todos los módulos se unificarán visualmente.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { k: 'primary',    l: 'Primario',     d: 'Botones y Acentos' },
+                { k: 'secondary',  l: 'Secundario',   d: 'Elementos suaves' },
+                { k: 'accent',     l: 'Acento',       d: 'Detalles brillantes' },
+                { k: 'background', l: 'Fondo Base',   d: 'Color de la web' }
+              ].map(item => (
+                <div key={item.k}>
+                  <label className="block text-[10px] text-zinc-400 mb-1 uppercase font-bold">{item.l}</label>
+                  <div className="flex flex-col gap-2">
+                    <input type="color" value={config.brand?.[item.k] || '#000'} 
+                      onChange={e => set('brand', { ...(config.brand || {}), [item.k]: e.target.value })} 
+                      className="w-full h-10 rounded-xl cursor-pointer bg-zinc-950 border border-zinc-800" />
+                    <input type="text" value={config.brand?.[item.k] || '#000'} 
+                      onChange={e => set('brand', { ...(config.brand || {}), [item.k]: e.target.value })} 
+                      className="w-full px-2 py-1 bg-zinc-950 border border-zinc-800 rounded-lg text-white font-mono text-[10px] uppercase text-center" />
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </>
-      )}
 
-      {/* ══════════════════════════════════════════════
-          ANNOUNCEMENT (Anuncio)
-      ══════════════════════════════════════════════ */}
-      {mod.type === 'announcement' && (
-        <div className="space-y-6">
           <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📢 Contenido del Anuncio</h4>
-            <textarea value={config.text || ''} onChange={e => set('text', e.target.value)} rows={2} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white resize-none shadow-inner" placeholder="Escribe tu anuncio aquí..." />
-            <div className="grid grid-cols-2 gap-4">
-              <input type="text" value={config.linkText || ''} onChange={e => set('linkText', e.target.value)} placeholder="Texto del enlace" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
-              <input type="text" value={config.link || ''} onChange={e => set('link', e.target.value)} placeholder="URL..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🏷️ Logotipo y Identidad</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={config.showLogo ?? true} onChange={e => set('showLogo', e.target.checked)} className="w-5 h-5 rounded accent-purple-500" />
+                  <span className="text-sm text-white font-medium">Mostrar Logotipo en la barra</span>
+                </label>
+                <input type="text" value={config.logoText || ''} onChange={e => set('logoText', e.target.value)} placeholder="Nombre de tu negocio" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black text-lg" />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-xs text-zinc-500 uppercase font-bold">Tamaño Visual</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['sm', 'md', 'lg'].map(s => (
+                    <button key={s} onClick={() => set('logoSize', s)} className={`py-2 text-xs font-bold rounded-xl border transition-all ${config.logoSize === s ? 'bg-purple-600 border-purple-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}>
+                      {s === 'sm' ? 'Pequeño' : s === 'md' ? 'Mediano' : 'Grande'}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
+
           <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Estilo</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <input type="color" value={config.bgColor || '#7c3aed'} onChange={e => set('bgColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-zinc-950" />
-              <input type="color" value={config.textColor || '#ffffff'} onChange={e => set('textColor', e.target.value)} className="w-full h-10 rounded-lg cursor-pointer bg-zinc-950" />
+             <div className="flex justify-between items-center">
+              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🔗 Enlaces de Navegación</h4>
+              <button onClick={() => addArrayItem('links', { label: 'Nuevo Enlace', url: '#', openNewTab: false })}
+                className="text-xs bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-4 rounded-xl transition border border-zinc-700">+ Añadir Enlace</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(config.links || []).map((link: any, idx: number) => (
+                <div key={link.id || idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl relative group shadow-lg">
+                  <button onClick={() => removeArrayItem('links', idx)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full text-[10px] flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                  <div className="space-y-3">
+                    <input type="text" value={link.label || ''} onChange={e => handleArrayChange('links', idx, 'label', e.target.value)} placeholder="Etiqueta" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-sm font-bold" />
+                    <input type="text" value={link.url || ''} onChange={e => handleArrayChange('links', idx, 'url', e.target.value)} placeholder="URL (#seccion)" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-lg text-zinc-400 text-xs" />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
       {/* ══════════════════════════════════════════════
-          HERO (Portada)
+          ANNOUNCEMENT
       ══════════════════════════════════════════════ */}
-      {mod.type === 'hero' && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Contenido</h4>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Título principal</label>
-              <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Subtítulo o descripción</label>
-              <textarea rows={2} value={config.subtitle || ''} onChange={e => set('subtitle', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white resize-none" />
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Texto del botón</label>
-              <input type="text" value={config.buttonText || ''} onChange={e => set('buttonText', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-            </div>
-          </div>
-        </>
+      {mod.type === 'announcement' && (
+        <div className="space-y-6">
+           <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📢 Mensaje Importante</h4>
+              <textarea value={config.text || ''} onChange={e => set('text', e.target.value)} placeholder="¡Gran liquidación este viernes! 🎉" rows={3} className="w-full px-4 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white font-medium shadow-inner" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <input type="text" value={config.linkText || ''} onChange={e => set('linkText', e.target.value)} placeholder="Texto del enlace (Opcional)" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm" />
+                 <input type="text" value={config.link || ''} onChange={e => set('link', e.target.value)} placeholder="URL destino" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm" />
+              </div>
+           </div>
+           <StyleSection config={config} onChange={set} />
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════
-          FEATURES (Servicios / Tarjetas)
+          HERO (Portada Principal)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'hero' && (
+        <div className="space-y-6">
+          <div className="p-1 pl-6 bg-gradient-to-r from-purple-600/20 to-transparent border-l-4 border-purple-500 py-4 mb-4">
+            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">Transforma tu primera impresión</h3>
+          </div>
+          <StyleSection config={config} onChange={set} />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Textos Maestros</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Etiqueta Superior (Badge)</label>
+                  <input type="text" value={config.preTitleBadge || ''} onChange={e => set('preTitleBadge', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-purple-400 font-bold" placeholder="✨ NUEVO SERVICIO" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Título de alto impacto</label>
+                  <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-4 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black text-xl" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Descripción detallada</label>
+                  <textarea rows={4} value={config.subtitle || ''} onChange={e => set('subtitle', e.target.value)} className="w-full px-4 py-4 bg-zinc-950 border border-zinc-800 rounded-xl text-white/70 text-sm resize-none" />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
+              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🖼️ Imagen y Diseño</h4>
+               <div className="space-y-4">
+                 <div>
+                   <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">URL Imagen de fondo</label>
+                   <input type="text" value={config.backgroundImageUrl || ''} onChange={e => set('backgroundImageUrl', e.target.value)} placeholder="https://unsplash.com/..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-[10px]" />
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                   <div>
+                     <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Opacidad Capa</label>
+                     <input type="range" min="0" max="1" step="0.05" value={config.imageOverlayOpacity ?? 0.5} onChange={e => set('imageOverlayOpacity', parseFloat(e.target.value))} className="w-full h-8 accent-purple-500 mt-2" />
+                     <div className="text-center text-[10px] text-zinc-500">{Math.round((config.imageOverlayOpacity || 0.5) * 100)}% Oscuridad</div>
+                   </div>
+                   <div>
+                     <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Alineación</label>
+                     <select value={config.textAlign || 'center'} onChange={e => set('textAlign', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-2">
+                       <option value="left">Izquierda</option>
+                       <option value="center">Centro</option>
+                       <option value="right">Derecha</option>
+                     </select>
+                   </div>
+                 </div>
+               </div>
+               <div className="pt-4 border-t border-zinc-800">
+                 <div className="flex justify-between items-center mb-4">
+                    <h5 className="text-[10px] text-zinc-500 uppercase font-black">Botones de Llamada a la Acción</h5>
+                    <button onClick={() => addArrayItem('buttons', { text: 'Saber más', url: '#', style: 'primary' })} className="text-[10px] bg-zinc-800 px-3 py-1 rounded-lg border border-zinc-700 text-white font-bold">+ Botón</button>
+                 </div>
+                 <div className="space-y-3">
+                   {(config.buttons || []).map((btn: any, idx: number) => (
+                      <div key={idx} className="flex gap-2 items-center bg-black/40 p-2 rounded-xl border border-zinc-800">
+                        <input type="text" value={btn.text} onChange={e => handleArrayChange('buttons', idx, 'text', e.target.value)} placeholder="Texto" className="w-1/3 px-2 py-1 bg-transparent text-white text-[10px] font-bold border-r border-zinc-800" />
+                        <input type="text" value={btn.url} onChange={e => handleArrayChange('buttons', idx, 'url', e.target.value)} placeholder="URL" className="flex-1 px-2 py-1 bg-transparent text-zinc-500 text-[10px]" />
+                        <select value={btn.style} onChange={e => handleArrayChange('buttons', idx, 'style', e.target.value)} className="bg-transparent text-[9px] text-purple-400 font-bold outline-none">
+                          <option value="primary">Primario</option>
+                          <option value="outline">Borde</option>
+                          <option value="ghost">Limpio</option>
+                        </select>
+                        <button onClick={() => removeArrayItem('buttons', idx)} className="text-zinc-700 hover:text-red-500 px-1">✕</button>
+                      </div>
+                   ))}
+                 </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          FEATURES (Servicios / Beneficios)
       ══════════════════════════════════════════════ */}
       {mod.type === 'features' && (
-        <>
+        <div className="space-y-6">
           <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Título de la sección</label>
-              <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Encabezado</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Título: Nuestros Servicios" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+              <input type="text" value={config.subtitle || ''} onChange={e => set('subtitle', e.target.value)} placeholder="Subtítulo corto opcional" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-400 text-sm" />
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium text-white text-sm">🃏 Tarjetas de Servicio</h4>
-                <button onClick={() => addArrayItem('cards', { title: "Nueva Tarjeta", subtitle: "Algo breve", description: "Descripción..." })}
-                  className="text-xs bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-1.5 px-3 rounded-lg transition">+ Tarjeta</button>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Nº Columnas (PC)</label>
+                <select value={config.columns || 3} onChange={e => set('columns', parseInt(e.target.value))} className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs">
+                  <option value={2}>2 Columnas</option>
+                  <option value={3}>3 Columnas</option>
+                  <option value={4}>4 Columnas</option>
+                </select>
               </div>
-              <div className="space-y-3">
-                {(config.cards || []).map((card: any, idx: number) => (
-                  <div key={card.id || idx} className="p-4 bg-zinc-900 border border-zinc-700/50 rounded-xl relative group">
-                    <button onClick={() => removeArrayItem('cards', idx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
-                    <h5 className="text-[10px] text-zinc-500 mb-2 uppercase tracking-wider font-bold">Tarjeta #{idx + 1}</h5>
-                    <div className="space-y-2">
-                      <input type="text" value={card.title || ''} onChange={e => handleArrayChange('cards', idx, 'title', e.target.value)} placeholder="Título" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
-                      <input type="text" value={card.subtitle || ''} onChange={e => handleArrayChange('cards', idx, 'subtitle', e.target.value)} placeholder="Subtítulo breve" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
+              <div>
+                <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Estilo Visual</label>
+                <select value={config.cardStyle || 'glass'} onChange={e => set('cardStyle', e.target.value)} className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs">
+                  <option value="glass">Cristal (Elegante)</option>
+                  <option value="clean">Moderno (Limpio)</option>
+                  <option value="bordered">Clásico (Bordes)</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-                      {/* Párrafos dinámicos */}
-                      <div className="pt-2 space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Párrafos</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newCards = [...(config.cards || [])]
-                              const paragraphs = [...(newCards[idx].paragraphs || []), '']
-                              newCards[idx] = { ...newCards[idx], paragraphs }
-                              setConfig((prev: any) => ({ ...prev, cards: newCards }))
-                            }}
-                            className="text-[10px] bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-0.5 px-2 rounded transition"
-                          >+ Párrafo</button>
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+             <div className="flex justify-between items-center">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🃏 Tarjetas de Servicios</h4>
+                <button onClick={() => addArrayItem('cards', { emoji: '✨', title: 'Nuevo Servicio', subtitle: 'Precio/Detalle', paragraphs: ['Explica qué ofreces aquí...'] })} className="text-xs bg-cyan-700 px-4 py-2 rounded-xl text-white font-bold">+ Nuevo Servicio</button>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               {(config.cards || []).map((card: any, idx: number) => (
+                 <div key={card.id || idx} className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl relative group shadow-2xl hover:border-cyan-500/30 transition-all">
+                    <button onClick={() => removeArrayItem('cards', idx)} className="absolute top-3 right-3 text-zinc-700 hover:text-red-500 transition-colors">✕</button>
+                    <div className="flex gap-4 mb-4">
+                       <div className="w-16 h-16 shrink-0 bg-black border border-zinc-800 rounded-2xl flex items-center justify-center text-3xl">
+                         <input type="text" value={card.emoji} onChange={e => handleArrayChange('cards', idx, 'emoji', e.target.value)} className="w-full bg-transparent text-center focus:outline-none" />
+                       </div>
+                       <div className="flex-1 space-y-2">
+                         <input type="text" value={card.title} onChange={e => handleArrayChange('cards', idx, 'title', e.target.value)} placeholder="Título" className="w-full bg-transparent text-white font-black text-lg focus:border-b border-purple-500" />
+                         <input type="text" value={card.subtitle} onChange={e => handleArrayChange('cards', idx, 'subtitle', e.target.value)} placeholder="Subtítulo / Precio" className="w-full bg-transparent text-purple-400 text-xs font-bold uppercase tracking-widest" />
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       {card.paragraphs?.map((p: string, pIdx: number) => (
+                         <div key={pIdx} className="flex gap-2">
+                            <textarea value={p} onChange={e => {
+                               const newCards = [...config.cards]; newCards[idx].paragraphs[pIdx] = e.target.value; set('cards', newCards)
+                            }} rows={2} className="w-full bg-black/40 border border-zinc-800 rounded-xl px-3 py-2 text-white/70 text-[11px] resize-none" />
+                            {card.paragraphs.length > 1 && (
+                              <button onClick={() => {
+                                const newCards = [...config.cards]; newCards[idx].paragraphs.splice(pIdx, 1); set('cards', newCards)
+                              }} className="text-zinc-800 hover:text-red-500">✕</button>
+                            )}
+                         </div>
+                       ))}
+                       <button onClick={() => {
+                          const newCards = [...config.cards]; newCards[idx].paragraphs = [...(newCards[idx].paragraphs || []), '']; set('cards', newCards)
+                       }} className="w-full py-1.5 border border-zinc-800 border-dashed rounded-lg text-[10px] text-zinc-600 hover:text-zinc-400">+ Añadir Párrafo</button>
+                    </div>
+                 </div>
+               ))}
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          PRICING (Tarifas)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'pricing' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                   <label className="block text-[10px] text-zinc-500 mb-1 font-black uppercase">Título Sección</label>
+                   <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+                </div>
+                <div>
+                   <label className="block text-[10px] text-zinc-500 mb-1 font-black uppercase">Moneda</label>
+                   <input type="text" value={config.currency || '€'} onChange={e => set('currency', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-emerald-400 font-black text-center" />
+                </div>
+             </div>
+          </div>
+          
+          <div className="space-y-6">
+             <div className="flex justify-between items-center">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">💰 Categorías de Precios</h4>
+                <button onClick={() => addArrayItem('categories', { name: 'Nueva Categoría', items: [{ name: 'Ejemplo', price: '10', description: 'Opcional' }] })} className="text-xs bg-emerald-700 px-4 py-2 rounded-xl text-white font-bold">+ Añadir Categoría</button>
+             </div>
+             {(config.categories || []).map((cat: any, cIdx: number) => (
+                <div key={cat.id || cIdx} className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl relative space-y-4 shadow-2xl">
+                   <button onClick={() => removeArrayItem('categories', cIdx)} className="absolute top-4 right-4 text-zinc-600 hover:text-red-500">✕ Eliminar Categoría</button>
+                   <div className="max-w-md">
+                      <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Nombre de la Categoría</label>
+                      <input type="text" value={cat.name} onChange={e => handleArrayChange('categories', cIdx, 'name', e.target.value)} className="w-full px-4 py-2 bg-black border border-zinc-800 rounded-xl text-white font-black text-lg" />
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {cat.items?.map((item: any, iIdx: number) => (
+                        <div key={iIdx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl flex gap-3 group">
+                           <div className="flex-1 space-y-2">
+                              <input type="text" value={item.name} onChange={e => {
+                                 const newCats = [...config.categories]; newCats[cIdx].items[iIdx].name = e.target.value; set('categories', newCats)
+                              }} placeholder="Nombre" className="w-full bg-transparent text-white font-bold text-sm focus:border-b border-white/20" />
+                              <input type="text" value={item.description} onChange={e => {
+                                 const newCats = [...config.categories]; newCats[cIdx].items[iIdx].description = e.target.value; set('categories', newCats)
+                              }} placeholder="Descripción" className="w-full bg-transparent text-zinc-500 text-[10px]" />
+                           </div>
+                           <div className="w-20 text-right">
+                              <input type="text" value={item.price} onChange={e => {
+                                 const newCats = [...config.categories]; newCats[cIdx].items[iIdx].price = e.target.value; set('categories', newCats)
+                              }} className="w-full bg-zinc-800 text-white font-black text-center py-1 rounded-lg border border-zinc-700" />
+                              <button onClick={() => {
+                                 const newCats = [...config.categories]; newCats[cIdx].items.splice(iIdx, 1); set('categories', newCats)
+                              }} className="text-[10px] text-red-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+                           </div>
                         </div>
-                        {(card.paragraphs || []).map((para: string, pIdx: number) => (
-                          <div key={pIdx} className="flex gap-2">
-                            <input
-                              type="text"
-                              value={para}
-                              onChange={e => {
-                                const newCards = [...(config.cards || [])]
-                                const paragraphs = [...(newCards[idx].paragraphs || [])]
-                                paragraphs[pIdx] = e.target.value
-                                newCards[idx] = { ...newCards[idx], paragraphs }
-                                setConfig((prev: any) => ({ ...prev, cards: newCards }))
-                              }}
-                              placeholder={`Párrafo ${pIdx + 1}...`}
-                              className="flex-1 px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newCards = [...(config.cards || [])]
-                                const paragraphs = [...(newCards[idx].paragraphs || [])]
-                                paragraphs.splice(pIdx, 1)
-                                newCards[idx] = { ...newCards[idx], paragraphs }
-                                setConfig((prev: any) => ({ ...prev, cards: newCards }))
-                              }}
-                              className="p-2 text-zinc-600 hover:text-red-400 rounded-lg transition"
-                            >✕</button>
+                      ))}
+                      <button onClick={() => {
+                         const newCats = [...config.categories]; newCats[cIdx].items.push({ name: 'Nuevo', price: '0', description: '' }); set('categories', newCats)
+                      }} className="p-4 border border-zinc-800 border-dashed rounded-2xl flex items-center justify-center text-xs text-zinc-600 hover:bg-zinc-900 hover:text-zinc-400 transition-all">+ Añadir Item</button>
+                   </div>
+                </div>
+             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          GALLERY / TEAM / STATS
+      ══════════════════════════════════════════════ */}
+      {(mod.type === 'gallery' || mod.type === 'team' || mod.type === 'stats') && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+             <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Encabezado</h4>
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Título Principal" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+                <input type="text" value={config.subtitle || ''} onChange={e => set('subtitle', e.target.value)} placeholder="Subtítulo corto" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-400" />
+             </div>
+             {mod.type === 'gallery' && (
+                <div className="w-48">
+                   <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Nº de Columnas</label>
+                   <select value={config.columns || 3} onChange={e => set('columns', parseInt(e.target.value))} className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm">
+                      <option value={2}>2 Columnas</option>
+                      <option value={3}>3 Columnas</option>
+                      <option value={4}>4 Columnas</option>
+                   </select>
+                </div>
+             )}
+          </div>
+
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
+             <div className="flex justify-between items-center">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">{mod.type === 'gallery' ? '🖼️ Galería de Fotos' : mod.type === 'team' ? '👥 El Equipo' : '📊 Estadísticas'}</h4>
+                <button onClick={() => addArrayItem(mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats', 
+                  mod.type === 'gallery' ? { url: '', alt: '' } : mod.type === 'team' ? { name: 'Nombre', role: 'Cargo', imageUrl: '', bio: 'Breve historia' } : { number: '100', label: 'Dato' })} 
+                  className="text-xs bg-zinc-700 px-4 py-2 rounded-xl text-white font-bold shadow-lg">+ Añadir Nuevo</button>
+             </div>
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(config[mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats'] || []).map((item: any, idx: number) => (
+                   <div key={idx} className="p-5 bg-zinc-900 border border-zinc-800 rounded-3xl relative hover:border-purple-500/50 transition-all shadow-xl group">
+                      <button onClick={() => removeArrayItem(mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats', idx)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                      
+                      {mod.type === 'gallery' && (
+                        <div className="space-y-3">
+                           <div className="w-full aspect-video bg-black rounded-xl overflow-hidden border border-zinc-800 mb-3">
+                              {item.url ? <img src={item.url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-zinc-800 text-4xl">🖼️</div>}
+                           </div>
+                           <input type="text" value={item.url} onChange={e => handleArrayChange('images', idx, 'url', e.target.value)} placeholder="URL de la imagen" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-xl text-zinc-500 text-[10px]" />
+                        </div>
+                      )}
+
+                      {mod.type === 'team' && (
+                        <div className="space-y-4">
+                           <div className="flex gap-4 items-center">
+                              <div className="w-16 h-16 bg-zinc-800 rounded-2xl overflow-hidden border-2 border-zinc-700 shrink-0">
+                                 {item.imageUrl ? <img src={item.imageUrl} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-2xl">👤</div>}
+                              </div>
+                              <div className="flex-1 space-y-1">
+                                 <input type="text" value={item.name} onChange={e => handleArrayChange('members', idx, 'name', e.target.value)} placeholder="Nombre" className="w-full bg-transparent text-white font-black text-sm" />
+                                 <input type="text" value={item.role} onChange={e => handleArrayChange('members', idx, 'role', e.target.value)} placeholder="Cargo" className="w-full bg-transparent text-purple-400 text-[10px] font-bold uppercase" />
+                              </div>
+                           </div>
+                           <textarea value={item.bio} onChange={e => handleArrayChange('members', idx, 'bio', e.target.value)} placeholder="Biografía corta..." rows={3} className="w-full bg-black/40 border border-zinc-800 rounded-2xl px-3 py-2 text-white/60 text-[10px] resize-none" />
+                           <input type="text" value={item.imageUrl} onChange={e => handleArrayChange('members', idx, 'imageUrl', e.target.value)} placeholder="URL de la Foto" className="w-full bg-black border border-zinc-800 rounded-lg px-2 py-1 text-zinc-600 text-[9px]" />
+                        </div>
+                      )}
+
+                      {mod.type === 'stats' && (
+                        <div className="text-center space-y-2 py-4">
+                           <input type="text" value={item.number} onChange={e => handleArrayChange('stats', idx, 'number', e.target.value)} className="w-full bg-transparent text-white font-black text-4xl text-center" />
+                           <input type="text" value={item.label} onChange={e => handleArrayChange('stats', idx, 'label', e.target.value)} className="w-full bg-transparent text-zinc-500 text-xs text-center uppercase font-bold tracking-widest" />
+                        </div>
+                      )}
+                   </div>
+                ))}
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          CONTACT (Mapa y Datos)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'contact' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          
+          {/* Toggle de Sincronización */}
+          <div className="p-6 bg-purple-500/10 border border-purple-500/30 rounded-3xl flex items-center justify-between gap-6 shadow-[0_0_50px_rgba(124,58,237,0.1)]">
+            <div className="flex gap-4 items-center">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center text-2xl shadow-inner">💎</div>
+              <div>
+                <h4 className="text-white font-black text-sm uppercase tracking-widest">Vincular con Identidad de Marca</h4>
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">Usa automáticamente los teléfonos, email, dirección y mapa configurados globalmente.</p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer scale-125 mr-2">
+              <input type="checkbox" className="sr-only peer" checked={config.useGlobalContact ?? true} onChange={e => set('useGlobalContact', e.target.checked)} />
+              <div className="w-11 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full border border-zinc-700"></div>
+            </label>
+          </div>
+
+          <div className="p-8 bg-zinc-950/40 border border-zinc-800 rounded-3xl space-y-8 relative overflow-hidden">
+             <div className="flex items-center justify-between border-b border-zinc-800/50 pb-6">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest flex items-center gap-3">
+                  <span className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center text-xs">📬</span>
+                  Información de Contacto
+                </h4>
+                {config.useGlobalContact && <span className="text-[9px] bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full font-black uppercase tracking-widest animate-pulse border border-purple-500/30">✨ Sincronizado</span>}
+             </div>
+
+             {config.useGlobalContact ? (
+               /* VISTA PREVIA SINCRONIZADA */
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 opacity-80 py-4">
+                  <div className="space-y-6">
+                     <div className="space-y-1">
+                        <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">Email Corporativo</p>
+                        <p className="text-white font-bold">{initialSettings?.contactEmail || 'No configurado'}</p>
+                     </div>
+                     <div className="space-y-1">
+                        <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">Teléfonos</p>
+                        <div className="flex flex-wrap gap-3">
+                           {(initialSettings?.contactPhones || []).length > 0 ? (initialSettings.contactPhones.map((p: string, i: number) => (
+                             <span key={i} className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 text-xs font-mono">{p}</span>
+                           ))) : <p className="text-zinc-500 italic text-xs">Sin teléfonos</p>}
+                        </div>
+                     </div>
+                     <div className="space-y-1">
+                        <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">Sede Física</p>
+                        <p className="text-white font-bold">{initialSettings?.address || 'No configurado'}</p>
+                        <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">{initialSettings?.city} {initialSettings?.province} {initialSettings?.country}</p>
+                     </div>
+                  </div>
+                  <div className="relative aspect-video rounded-3xl overflow-hidden border border-zinc-800 bg-black flex items-center justify-center group">
+                     {initialSettings?.locationMapUrl ? (
+                        <iframe src={initialSettings.locationMapUrl} className="absolute inset-0 w-full h-full grayscale invert opacity-40 group-hover:opacity-60 transition-opacity" />
+                     ) : <span className="text-4xl">🗺️</span>}
+                     <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black to-transparent">
+                        <p className="text-[9px] text-zinc-500 font-black uppercase text-center tracking-widest">Mapa Sincronizado</p>
+                     </div>
+                  </div>
+               </div>
+             ) : (
+               /* EDITOR MANUAL */
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                     <div className="space-y-2">
+                        <label className="block text-[10px] text-zinc-500 font-black uppercase tracking-widest pl-1">Email Específico</label>
+                        <input type="email" value={config.email || ''} onChange={e => set('email', e.target.value)} className="w-full px-5 py-4 bg-black/60 border border-zinc-800 rounded-2xl text-white font-bold focus:border-purple-500 outline-none transition-all" placeholder="sucursal@ejemplo.com" />
+                     </div>
+                     <div className="space-y-4">
+                        <div className="flex items-center justify-between pl-1">
+                          <label className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Números de Teléfono</label>
+                          <button onClick={() => set('contactPhones', [...(config.contactPhones || []), ''])} className="text-[9px] bg-white/5 border border-white/10 px-3 py-1 rounded-full text-zinc-400 hover:text-white transition-all font-black uppercase">+ Añadir</button>
+                        </div>
+                        <div className="space-y-3">
+                           {(config.contactPhones || []).map((p: string, i: number) => (
+                             <div key={i} className="flex gap-2">
+                               <input type="text" value={p} onChange={e => {
+                                 const np = [...config.contactPhones]; np[i] = e.target.value; set('contactPhones', np)
+                               }} className="w-full px-4 py-3 bg-black/60 border border-zinc-800 rounded-xl text-white text-xs font-mono" placeholder="+34 600..." />
+                               <button onClick={() => {
+                                 const np = [...config.contactPhones]; np.splice(i, 1); set('contactPhones', np)
+                               }} className="px-3 text-zinc-700 hover:text-red-500 transition-colors">✕</button>
+                             </div>
+                           ))}
+                           {(!config.contactPhones || config.contactPhones.length === 0) && (
+                             <p className="text-[10px] text-zinc-700 italic">No hay teléfonos manuales.</p>
+                           )}
+                        </div>
+                     </div>
+                     <div className="space-y-2">
+                        <label className="block text-[10px] text-zinc-500 font-black uppercase tracking-widest pl-1">Dirección Específica</label>
+                        <input type="text" value={config.address || ''} onChange={e => set('address', e.target.value)} placeholder="Calle Falsa 123, Ciudad" className="w-full px-5 py-4 bg-black/60 border border-zinc-800 rounded-2xl text-white text-sm focus:border-purple-500 outline-none transition-all" />
+                     </div>
+                  </div>
+                  <div className="space-y-4">
+                     <div className="flex justify-between items-center pl-1">
+                        <label className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Mapa de Google (Iframe Embed)</label>
+                        <a href="https://www.google.com/maps" target="_blank" className="text-[9px] text-purple-400 underline italic uppercase font-black">Abrir Maps</a>
+                     </div>
+                     <textarea rows={8} value={config.mapEmbedUrl || ''} onChange={e => set('mapEmbedUrl', e.target.value)} placeholder="Pega aquí solo el 'src' del iframe de Google Maps" className="w-full px-5 py-5 bg-black/60 border border-zinc-800 rounded-3xl text-white text-[10px] font-mono resize-none focus:border-purple-500 outline-none transition-all shadow-inner" />
+                  </div>
+               </div>
+             )}
+          </div>
+
+          <div className="p-8 bg-zinc-950/40 border border-zinc-800 rounded-3xl space-y-6">
+             <div className="flex items-center justify-between pb-4 border-b border-zinc-800/50">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest flex items-center gap-3">
+                   <span className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center text-xs">📱</span>
+                   Redes Sociales del Módulo
+                </h4>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" checked={config.showSocials ?? true} onChange={e => set('showSocials', e.target.checked)} />
+                  <div className="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full border border-zinc-600"></div>
+                </label>
+             </div>
+             {config.showSocials && (
+                <div className="space-y-6">
+                   <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[10px] text-white font-black uppercase tracking-widest">Vincular Socials con Marca</p>
+                        <p className="text-[9px] text-zinc-500 uppercase font-bold">Usa los enlaces de Instagram, TikTok, etc. configurados globalmente.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={config.useGlobalSocials ?? true} onChange={e => set('useGlobalSocials', e.target.checked)} />
+                        <div className="w-8 h-4 bg-zinc-800 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-full"></div>
+                      </label>
+                   </div>
+                   
+                   {!config.useGlobalSocials && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in duration-300">
+                         {['Instagram','Facebook','TikTok','Twitter'].map(s => (
+                           <div key={s} className="space-y-1">
+                              <label className="block text-[9px] text-zinc-600 mb-1 uppercase font-black tracking-widest pl-1">{s}</label>
+                              <input type="text" value={config[s.toLowerCase()] || ''} onChange={e => set(s.toLowerCase(), e.target.value)} placeholder={`URL de ${s}`} className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-xl text-white text-[10px] focus:border-purple-500 outline-none transition-all" />
+                           </div>
+                         ))}
+                      </div>
+                   )}
+                </div>
+             )}
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          BOOKING (Citas / Reservas)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'booking' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+
+          {/* Toggle de Sincronización */}
+          <div className="p-6 bg-purple-500/10 border border-purple-500/30 rounded-3xl flex items-center justify-between gap-6 shadow-[0_0_50px_rgba(124,58,237,0.1)]">
+            <div className="flex gap-4 items-center">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center text-2xl shadow-inner">📅</div>
+              <div>
+                <h4 className="text-white font-black text-sm uppercase tracking-widest">Sincronizar Teléfonos con Marca</h4>
+                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">Los botones de reserva usarán el teléfono principal de tu Identidad de Marca.</p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer scale-125 mr-2">
+              <input type="checkbox" className="sr-only peer" checked={config.useGlobalBooking ?? true} onChange={e => set('useGlobalBooking', e.target.checked)} />
+              <div className="w-11 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full border border-zinc-700"></div>
+            </label>
+          </div>
+
+          <div className="p-8 bg-zinc-950/40 border border-zinc-800 rounded-3xl space-y-8 relative overflow-hidden">
+             <div className="text-center space-y-3 border-b border-zinc-800/50 pb-8">
+                <div className="text-4xl mx-auto mb-2 opacity-80">📱</div>
+                <h4 className="text-white font-black text-2xl uppercase tracking-tighter">Canales de Reserva</h4>
+                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Configura cómo quieres que tus clientes te contacten.</p>
+             </div>
+             
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {/* WhatsApp */}
+                <div className={`p-8 border rounded-[2.5rem] transition-all relative overflow-hidden group/wa ${config.showWhatsapp ? 'bg-green-600/5 border-green-500/20' : 'bg-zinc-900/20 border-zinc-800 opacity-40'}`}>
+                   <div className="flex items-center justify-between mb-6">
+                      <span className="text-3xl">🟢</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={config.showWhatsapp ?? true} onChange={e => set('showWhatsapp', e.target.checked)} />
+                        <div className="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-green-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full border border-zinc-600"></div>
+                      </label>
+                   </div>
+                   <h5 className="text-white font-black uppercase tracking-widest text-xs mb-1">WhatsApp Business</h5>
+                   <p className="text-[9px] text-zinc-500 mb-6 uppercase font-bold">Reserva vía chat</p>
+                   
+                   {config.useGlobalBooking ? (
+                     <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-zinc-400 font-mono text-xs animate-pulse">
+                        {initialSettings?.contactPhones?.[0] || 'Sin teléfono global'}
+                     </div>
+                   ) : (
+                     <input type="text" value={config.whatsapp || ''} onChange={e => set('whatsapp', e.target.value)} placeholder="+34 600..." className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-green-500 transition-all outline-none" />
+                   )}
+                </div>
+
+                {/* Teléfono */}
+                <div className={`p-8 border rounded-[2.5rem] transition-all relative overflow-hidden group/ph ${config.showPhone ? 'bg-purple-600/5 border-purple-500/20' : 'bg-zinc-900/20 border-zinc-800 opacity-40'}`}>
+                   <div className="flex items-center justify-between mb-6">
+                      <span className="text-3xl">📞</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={config.showPhone ?? true} onChange={e => set('showPhone', e.target.checked)} />
+                        <div className="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full border border-zinc-600"></div>
+                      </label>
+                   </div>
+                   <h5 className="text-white font-black uppercase tracking-widest text-xs mb-1">Llamada Directa</h5>
+                   <p className="text-[9px] text-zinc-500 mb-6 uppercase font-bold">Cita telefónica</p>
+                   
+                   {config.useGlobalBooking ? (
+                     <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-zinc-400 font-mono text-xs animate-pulse">
+                        {initialSettings?.contactPhones?.[0] || 'Sin teléfono global'}
+                     </div>
+                   ) : (
+                     <input type="text" value={config.phone || ''} onChange={e => set('phone', e.target.value)} placeholder="+34 91..." className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white font-mono text-sm focus:border-purple-500 transition-all outline-none" />
+                   )}
+                </div>
+             </div>
+
+                <div className="pt-6 border-t border-zinc-800 space-y-4">
+                   <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-white uppercase tracking-widest">🚀 Botón Personalizado (Reserva Externa)</h4>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={config.showBookingBtn ?? false} onChange={e => set('showBookingBtn', e.target.checked)} />
+                        <div className="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                      </label>
+                   </div>
+                   <p className="text-xs text-zinc-500">Úsalo para enlazar a plataformas externas (Fresha, Calendly, Treatwell, etc.)</p>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <input type="text" value={config.bookingBtnText || ''} onChange={e => set('bookingBtnText', e.target.value)} placeholder="Ej: Reservar en Fresha" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-bold text-sm" />
+                      <input type="text" value={config.bookingBtnUrl || ''} onChange={e => set('bookingBtnUrl', e.target.value)} placeholder="https://plataforma.com/tu-negocio" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-500 text-xs" />
+                   </div>
+                </div>
+             </div>
+          </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          FOOTER (Pie de Página)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'footer' && (
+        <div className="space-y-6">
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
+             <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📁 Información del Pie</h4>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                   <div>
+                      <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Nombre Comercial</label>
+                      <input type="text" value={config.businessName || ''} onChange={e => set('businessName', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black text-lg" />
+                   </div>
+                   <div>
+                      <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Lema o Descripción Corta</label>
+                      <textarea rows={3} value={config.tagline || ''} onChange={e => set('tagline', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs resize-none" />
+                   </div>
+                </div>
+                <div className="space-y-6">
+                   <div>
+                      <div className="flex items-center justify-between mb-3 pr-1">
+                        <label className="text-[10px] text-zinc-500 uppercase font-black">📱 Enlaces Sociales</label>
+                        <div className="p-2 bg-purple-500/5 border border-purple-500/10 rounded-lg flex items-center gap-2">
+                           <span className="text-[8px] text-purple-400 font-black uppercase">¿Sincronizar?</span>
+                           <label className="relative inline-flex items-center cursor-pointer scale-75">
+                              <input type="checkbox" className="sr-only peer" checked={config.useGlobalSocials ?? true} onChange={e => set('useGlobalSocials', e.target.checked)} />
+                              <div className="w-8 h-4 bg-zinc-800 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-full"></div>
+                           </label>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                         {['Instagram','Facebook','TikTok','Twitter','WhatsApp'].map(s => (
+                           <div key={s}>
+                              <input type="text" value={config.socials?.[s.toLowerCase()] || ''} 
+                                onChange={e => set('socials', { ...(config.socials || {}), [s.toLowerCase()]: e.target.value })} 
+                                placeholder={s} 
+                                disabled={config.useGlobalSocials ?? true}
+                                className={`w-full px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-[10px] transition-opacity ${(config.useGlobalSocials ?? true) ? 'opacity-30' : ''}`} />
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                   <div className="pt-4 border-t border-zinc-800">
+                      <div className="flex items-center justify-between mb-3 pr-1">
+                        <label className="text-[10px] text-zinc-500 uppercase font-black">Copyright de Autor</label>
+                         <label className="relative inline-flex items-center cursor-pointer">
+                           <input type="checkbox" className="sr-only peer" checked={config.showCopyright ?? true} onChange={e => set('showCopyright', e.target.checked)} />
+                           <div className="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-purple-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                         </label>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                         <input type="text" 
+                           value={config.useGlobalBrand ? `© ${new Date().getFullYear()} ${initialSettings?.businessName || 'Mi Negocio'}` : (config.copyrightText || '')} 
+                           onChange={e => set('copyrightText', e.target.value)} 
+                           placeholder="© 2026 Mi Negocio. Todos los derechos reservados." 
+                           disabled={config.useGlobalBrand ?? true}
+                           className={`flex-1 px-3 py-2 bg-black border border-zinc-800 rounded-lg text-zinc-500 text-[10px] transition-opacity ${(config.useGlobalBrand ?? true) ? 'opacity-50' : ''}`} />
+                         <button onClick={() => set('useGlobalBrand', !config.useGlobalBrand)} className={`px-3 py-2 rounded-lg text-[8px] font-black uppercase text-white transition-all ${config.useGlobalBrand ? 'bg-purple-600 shadow-[0_0_15px_rgba(124,58,237,0.3)]' : 'bg-zinc-800 border border-zinc-700'}`}>
+                            {config.useGlobalBrand ? '🔗 Marca' : 'Manual'}
+                         </button>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+             <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Colores del Footer</h4>
+             <div className="grid grid-cols-2 gap-4">
+                <div>
+                   <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Fondo</label>
+                   <input type="color" value={config.bgColor || '#09090b'} onChange={e => set('bgColor', e.target.value)} className="w-full h-10 rounded-xl cursor-pointer bg-black border border-zinc-800" />
+                </div>
+                <div>
+                   <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Texto</label>
+                   <input type="color" value={config.textColor || '#ffffff'} onChange={e => set('textColor', e.target.value)} className="w-full h-10 rounded-xl cursor-pointer bg-black border border-zinc-800" />
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          SCHEDULE (Horarios)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'schedule' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📅 Título de la Sección</h4>
+            <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Ej: Nuestros Horarios" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+          </div>
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">⏰ Días y Horas</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(config.days || []).map((day: any, idx: number) => (
+                <div key={idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-white font-black text-xs uppercase tracking-widest">{day.day}</span>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={!day.closed} onChange={e => handleArrayChange('days', idx, 'closed', !e.target.checked)} className="w-4 h-4 rounded accent-purple-500" />
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase">Abierto</span>
+                    </label>
+                  </div>
+                  {!day.closed && (
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        {(day.intervals || []).map((interval: any, subIdx: number) => (
+                          <div key={subIdx} className="flex gap-2 items-center group/int">
+                            <input type="text" value={interval.open} onChange={e => handleDayIntervalChange(idx, subIdx, 'open', e.target.value)} placeholder="09:00" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-center text-xs" />
+                            <span className="text-zinc-600">—</span>
+                            <input type="text" value={interval.close} onChange={e => handleDayIntervalChange(idx, subIdx, 'close', e.target.value)} placeholder="14:00" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-lg text-white text-center text-xs" />
+                            <button onClick={() => removeDayInterval(idx, subIdx)} className="text-zinc-700 hover:text-red-500 opacity-0 group-hover/int:opacity-100 transition-opacity px-1">✕</button>
                           </div>
                         ))}
                       </div>
+                      <button onClick={() => addDayInterval(idx)} className="w-full py-2 border border-dashed border-zinc-800 rounded-xl text-[9px] text-zinc-600 font-black uppercase hover:border-zinc-700 hover:text-zinc-400 transition-all">+ Añadir Turno</button>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════
-          FAQ
+          FAQ (Preguntas Frecuentes)
       ══════════════════════════════════════════════ */}
       {mod.type === 'faq' && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Título de la sección</label>
-              <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium text-white text-sm">❓ Preguntas</h4>
-                <button onClick={() => addArrayItem('faqs', { question: "¿Nueva pregunta?", answer: "Respuesta aquí." })}
-                  className="text-xs bg-green-700 hover:bg-green-600 text-white font-bold py-1.5 px-3 rounded-lg transition">+ Pregunta</button>
-              </div>
-              <div className="space-y-3">
-                {(config.faqs || []).map((faq: any, idx: number) => (
-                  <div key={faq.id || idx} className="p-4 bg-zinc-900 border border-zinc-700/50 rounded-xl relative group">
-                    <button onClick={() => removeArrayItem('faqs', idx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
-                    <div className="space-y-2">
-                      <input type="text" value={faq.question || ''} onChange={e => handleArrayChange('faqs', idx, 'question', e.target.value)} placeholder="¿Cuál es la pregunta?" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm font-semibold" />
-                      <textarea value={faq.answer || ''} onChange={e => handleArrayChange('faqs', idx, 'answer', e.target.value)} placeholder="Respuesta..." rows={2} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm resize-none" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          CONTACT
-      ══════════════════════════════════════════════ */}
-      {mod.type === 'contact' && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📬 Datos y Mapa</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-zinc-500 mb-1">Email</label>
-                <input type="email" value={config.email || ''} onChange={e => set('email', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-500 mb-1">Teléfono</label>
-                <input type="text" value={config.phone || ''} onChange={e => set('phone', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Dirección Física</label>
-              <input type="text" value={config.address || ''} onChange={e => set('address', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">URL de Mapa Embebido (Google Maps Iframe src)</label>
-              <input type="text" value={config.mapEmbedUrl || ''} onChange={e => set('mapEmbedUrl', e.target.value)} placeholder="https://www.google.com/maps/embed?..." className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={config.showSocials ?? false} onChange={e => set('showSocials', e.target.checked)} className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 accent-purple-500" />
-                <span className="text-sm text-zinc-300">Mostrar Redes Sociales</span>
-              </label>
-            </div>
-            {config.showSocials && (
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                {['Instagram','Facebook','TikTok','Twitter'].map(s => (
-                  <div key={s}>
-                    <label className="block text-[10px] text-zinc-500 mb-1 uppercase tracking-wider">{s}</label>
-                    <input type="text" value={config[s.toLowerCase()] || ''} onChange={e => set(s.toLowerCase(), e.target.value)} placeholder="URL..." className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-xs" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          REVIEWS (Reseñas)
-      ══════════════════════════════════════════════ */}
-      {mod.type === 'reviews' && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <div>
-              <label className="block text-xs text-zinc-500 mb-1">Título de la sección</label>
-              <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white" />
-            </div>
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium text-white text-sm">⭐ Listado de Reseñas</h4>
-              <button onClick={() => addArrayItem('reviews', { author: "Nombre Cliente", text: "Excelente servicio...", rating: 5 })}
-                className="text-xs bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-1.5 px-3 rounded-lg transition">+ Reseña</button>
-            </div>
-            <div className="space-y-4">
-              {(config.reviews || []).map((r: any, idx: number) => (
-                <div key={r.id || idx} className="p-4 bg-zinc-900 border border-zinc-700/50 rounded-xl relative group space-y-3">
-                  <button onClick={() => removeArrayItem('reviews', idx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
-                  <div className="grid grid-cols-2 gap-3">
-                    <input type="text" value={r.author || ''} onChange={e => handleArrayChange('reviews', idx, 'author', e.target.value)} placeholder="Autor" className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm" />
-                    <select value={r.rating || 5} onChange={e => handleArrayChange('reviews', idx, 'rating', parseInt(e.target.value))} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm">
-                      {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Estrellas</option>)}
-                    </select>
-                  </div>
-                  <textarea value={r.text || ''} onChange={e => handleArrayChange('reviews', idx, 'text', e.target.value)} placeholder="Texto de la reseña..." rows={2} className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-sm resize-none" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          SCHEDULE (Horario)
-      ══════════════════════════════════════════════ */}
-      {mod.type === 'schedule' && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📅 Horario Comercial</h4>
-            <div className="space-y-2">
-              {(config.days || []).map((d: any, idx: number) => (
-                <div key={idx} className="flex items-center gap-3 p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
-                  <span className="text-sm font-bold text-white w-20 shrink-0">{d.day}</span>
-                  {!d.closed ? (
-                    <>
-                      <input type="text" value={d.open} onChange={e => handleArrayChange('days', idx, 'open', e.target.value)} className="flex-1 px-2 py-1 bg-black/40 border border-zinc-800 rounded text-white text-xs text-center" />
-                      <span className="text-zinc-600">a</span>
-                      <input type="text" value={d.close} onChange={e => handleArrayChange('days', idx, 'close', e.target.value)} className="flex-1 px-2 py-1 bg-black/40 border border-zinc-800 rounded text-white text-xs text-center" />
-                    </>
-                  ) : (
-                    <span className="flex-1 text-center text-red-500 text-xs font-bold uppercase tracking-widest">Cerrado</span>
-                  )}
-                  <label className="flex items-center gap-2 cursor-pointer ml-auto">
-                    <input type="checkbox" checked={d.closed} onChange={e => handleArrayChange('days', idx, 'closed', e.target.checked)} className="w-4 h-4 rounded accent-red-500" />
-                    <span className="text-[10px] text-zinc-500 uppercase font-black">Cerrado</span>
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          PRICING (Precios)
-      ══════════════════════════════════════════════ */}
-      {mod.type === 'pricing' && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
-            <div className="flex justify-between items-center">
-              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">💰 Tarifario</h4>
-              <button onClick={() => addArrayItem('categories', { name: "Nueva Categoría", items: [] })}
-                className="text-xs bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-1.5 px-3 rounded-lg">+ Categoría</button>
-            </div>
-            <div className="space-y-6">
-              {(config.categories || []).map((cat: any, cIdx: number) => (
-                <div key={cat.id || cIdx} className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-2xl relative">
-                  <button onClick={() => removeArrayItem('categories', cIdx)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 p-1">✕</button>
-                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-bold tracking-widest">Nombre Categoría</label>
-                  <input type="text" value={cat.name} onChange={e => handleArrayChange('categories', cIdx, 'name', e.target.value)} className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-xl text-white font-bold mb-4" />
-                  
-                  <div className="space-y-3">
-                    {(cat.items || []).map((item: any, iIdx: number) => (
-                      <div key={iIdx} className="flex gap-2 items-start bg-black/40 p-3 rounded-xl border border-zinc-800">
-                        <div className="flex-1 space-y-2">
-                          <input type="text" value={item.name} onChange={e => {
-                            const newCats = [...config.categories]; newCats[cIdx].items[iIdx].name = e.target.value; set('categories', newCats)
-                          }} placeholder="Servicio" className="w-full px-2 py-1 bg-transparent border-b border-zinc-800 text-white text-sm" />
-                          <input type="text" value={item.description} onChange={e => {
-                            const newCats = [...config.categories]; newCats[cIdx].items[iIdx].description = e.target.value; set('categories', newCats)
-                          }} placeholder="Descripción corta" className="w-full px-2 py-1 bg-transparent border-b border-zinc-800 text-zinc-500 text-xs" />
-                        </div>
-                        <input type="text" value={item.price} onChange={e => {
-                          const newCats = [...config.categories]; newCats[cIdx].items[iIdx].price = e.target.value; set('categories', newCats)
-                        }} className="w-16 px-2 py-1 bg-zinc-800 rounded font-black text-center text-white" />
-                        <button onClick={() => {
-                          const newCats = [...config.categories]; newCats[cIdx].items.splice(iIdx, 1); set('categories', newCats)
-                        }} className="text-zinc-600 py-1">✕</button>
-                      </div>
-                    ))}
-                    <button onClick={() => {
-                      const newCats = [...config.categories]; newCats[cIdx].items.push({ name: 'Nuevo Item', price: '0' }); set('categories', newCats)
-                    }} className="w-full py-2 border border-zinc-800 border-dashed rounded-xl text-xs text-zinc-500 hover:bg-zinc-800 transition">+ Añadir Servicio</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          GALLERY / TEAM / STATS (Compactos)
-      ══════════════════════════════════════════════ */}
-      {(mod.type === 'gallery' || mod.type === 'team' || mod.type === 'stats') && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <div className="flex justify-between items-center">
-              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">
-                {mod.type === 'gallery' ? '🖼️ Cuadrícula de Fotos' : mod.type === 'team' ? '👥 Miembros del Equipo' : '📊 Cifras Importantes'}
-              </h4>
-              <button 
-                onClick={() => addArrayItem(mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats', 
-                  mod.type === 'gallery' ? { url: '', alt: '' } : mod.type === 'team' ? { name: 'Nombre', role: 'Cargo', imageUrl: '' } : { number: '100', label: 'Escribe algo' })}
-                className="text-xs bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-1.5 px-3 rounded-lg transition"
-              >+ Añadir</button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(config[mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats'] || []).map((item: any, idx: number) => (
-                <div key={idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl relative space-y-2">
-                  <button onClick={() => removeArrayItem(mod.type === 'gallery' ? 'images' : mod.type === 'team' ? 'members' : 'stats', idx)} className="absolute top-1 right-1 text-zinc-600 hover:text-red-400">✕</button>
-                  {mod.type === 'gallery' && (
-                    <input type="text" value={item.url} onChange={e => handleArrayChange('images', idx, 'url', e.target.value)} placeholder="URL de la imagen" className="w-full px-2 py-1 bg-black text-white text-xs border border-zinc-800 rounded" />
-                  )}
-                  {mod.type === 'team' && (
-                    <>
-                      <input type="text" value={item.name} onChange={e => handleArrayChange('members', idx, 'name', e.target.value)} placeholder="Nombre" className="w-full px-2 py-1 bg-black text-white text-xs border border-zinc-800 rounded font-bold" />
-                      <input type="text" value={item.role} onChange={e => handleArrayChange('members', idx, 'role', e.target.value)} placeholder="Cargo" className="w-full px-2 py-1 bg-black text-zinc-400 text-[10px] border border-zinc-800 rounded" />
-                      <input type="text" value={item.imageUrl} onChange={e => handleArrayChange('members', idx, 'imageUrl', e.target.value)} placeholder="Foto URL" className="w-full px-2 py-1 bg-black text-white text-[10px] border border-zinc-800 rounded italic" />
-                    </>
-                  )}
-                  {mod.type === 'stats' && (
-                    <>
-                      <input type="text" value={item.number} onChange={e => handleArrayChange('stats', idx, 'number', e.target.value)} placeholder="Número" className="w-full px-2 py-1 bg-black text-white text-base border border-zinc-800 rounded font-black text-center" />
-                      <input type="text" value={item.label} onChange={e => handleArrayChange('stats', idx, 'label', e.target.value)} placeholder="Etiqueta" className="w-full px-2 py-1 bg-black text-zinc-500 text-xs border border-zinc-800 rounded text-center" />
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          CTA BANNER
-      ══════════════════════════════════════════════ */}
-      {mod.type === 'cta_banner' && (
-        <>
+        <div className="space-y-6">
           <StyleSection config={config} onChange={set} />
           <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Contenido CTA</h4>
-            <input type="text" value={config.badgeText} onChange={e => set('badgeText', e.target.value)} placeholder="Badge (ej: Oferta)" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm" />
-            <input type="text" value={config.title} onChange={e => set('title', e.target.value)} placeholder="Título llamativo" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-bold" />
-            <textarea value={config.subtitle} onChange={e => set('subtitle', e.target.value)} placeholder="Subtítulo..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm resize-none" />
-            <div className="grid grid-cols-2 gap-3">
-              <input type="text" value={config.btnText} onChange={e => set('btnText', e.target.value)} placeholder="Texto Botón" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
-              <input type="text" value={config.btnUrl} onChange={e => set('btnUrl', e.target.value)} placeholder="URL..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+             <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Encabezado</h4>
+             <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Ej: Preguntas Frecuentes" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+          </div>
+          <div className="space-y-4">
+             <div className="flex justify-between items-center px-2">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">❓ Lista de Preguntas</h4>
+                <button onClick={() => addArrayItem('faqs', { question: 'Nueva Pregunta', answer: 'Escribe aquí la respuesta...' })} className="text-xs bg-zinc-800 px-4 py-2 rounded-xl text-white font-bold">+ Añadir FAQ</button>
+             </div>
+             <div className="space-y-4">
+                {(config.faqs || []).map((faq: any, idx: number) => (
+                  <div key={idx} className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl relative group">
+                     <button onClick={() => removeArrayItem('faqs', idx)} className="absolute top-4 right-4 text-zinc-700 hover:text-red-500">✕</button>
+                     <div className="space-y-4">
+                        <input type="text" value={faq.question} onChange={e => handleArrayChange('faqs', idx, 'question', e.target.value)} placeholder="Pregunta" className="w-full bg-transparent text-white font-black text-lg focus:border-b border-purple-500 outline-none" />
+                        <textarea value={faq.answer} onChange={e => handleArrayChange('faqs', idx, 'answer', e.target.value)} placeholder="Respuesta..." rows={3} className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white/70 text-sm resize-none" />
+                     </div>
+                  </div>
+                ))}
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          STEPS (Proceso / Pasos de compra)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'steps' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+             <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Títulos</h4>
+             <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Ej: ¿Cómo trabajamos?" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+             <input type="text" value={config.subtitle || ''} onChange={e => set('subtitle', e.target.value)} placeholder="Subtítulo opcional" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-500" />
+          </div>
+          <div className="space-y-4">
+             <div className="flex justify-between items-center px-2">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">👣 Pasos del Proceso</h4>
+                <button onClick={() => addArrayItem('steps', { number: '01', title: 'Paso nuevo', description: 'Describe este paso...' })} className="text-xs bg-zinc-800 px-4 py-2 rounded-xl text-white font-bold">+ Añadir Paso</button>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(config.steps || []).map((step: any, idx: number) => (
+                  <div key={idx} className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl relative group">
+                     <button onClick={() => removeArrayItem('steps', idx)} className="absolute top-4 right-4 text-zinc-700 hover:text-red-500">✕</button>
+                     <div className="flex gap-4">
+                        <input type="text" value={step.number} onChange={e => handleArrayChange('steps', idx, 'number', e.target.value)} className="w-16 h-16 bg-black border border-zinc-800 rounded-2xl text-white font-black text-2xl text-center shrink-0" />
+                        <div className="flex-1 space-y-3">
+                           <input type="text" value={step.title} onChange={e => handleArrayChange('steps', idx, 'title', e.target.value)} placeholder="Título" className="w-full bg-transparent text-white font-black text-lg" />
+                           <textarea value={step.description} onChange={e => handleArrayChange('steps', idx, 'description', e.target.value)} placeholder="Descripción..." rows={2} className="w-full bg-black/40 border border-zinc-800 rounded-xl px-3 py-2 text-white/50 text-xs resize-none" />
+                        </div>
+                     </div>
+                  </div>
+                ))}
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          VIDEO (YouTube / Vimeo)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'video' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
+             <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎥 Configuración de Vídeo</h4>
+             <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Título del Vídeo</label>
+                  <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">URL de YouTube / Vimeo</label>
+                  <input type="text" value={config.videoUrl || ''} onChange={e => set('videoUrl', e.target.value)} placeholder="https://www.youtube.com/watch?v=..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-400 font-mono text-xs" />
+                  <p className="text-[9px] text-zinc-600 mt-2 uppercase tracking-tight">El sistema convertirá automáticamente el enlace a modo 'Embed'.</p>
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          IMAGE + TEXT (Secciones Mixtas)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'image_text' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+             <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">📝 Contenido Escrito</h4>
+                <div className="space-y-4">
+                   <input type="text" value={config.badge || ''} onChange={e => set('badge', e.target.value)} placeholder="Etiqueta (Badge)" className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-purple-400 text-xs font-bold" />
+                   <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Título de la Sección" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black text-2xl" />
+                   <div className="space-y-2">
+                      <label className="text-[10px] text-zinc-500 uppercase font-bold">Párrafos descriptivos</label>
+                      {(config.paragraphs || []).map((p: string, idx: number) => (
+                        <div key={idx} className="flex gap-2">
+                           <textarea value={p} onChange={e => {
+                             const newP = [...config.paragraphs]; newP[idx] = e.target.value; set('paragraphs', newP)
+                           }} rows={3} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white/70 text-sm resize-none" />
+                           <button onClick={() => {
+                             const newP = [...config.paragraphs]; newP.splice(idx, 1); set('paragraphs', newP)
+                           }} className="text-red-500">✕</button>
+                        </div>
+                      ))}
+                      <button onClick={() => set('paragraphs', [...(config.paragraphs || []), ''])} className="w-full py-2 border border-dashed border-zinc-800 rounded-xl text-[10px] text-zinc-600">+ Añadir Párrafo</button>
+                   </div>
+                </div>
+             </div>
+             <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
+                <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🖼️ Imagen y Disposición</h4>
+                <div className="space-y-4">
+                   <select value={config.layout || 'image_left'} onChange={e => set('layout', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-bold text-sm">
+                      <option value="image_left">Imagen a la Izquierda</option>
+                      <option value="image_right">Imagen a la Derecha</option>
+                   </select>
+                   <div>
+                      <label className="text-[10px] text-zinc-500 uppercase font-black mb-1 block">URL de Imagen</label>
+                      <input type="text" value={config.imageUrl || ''} onChange={e => set('imageUrl', e.target.value)} className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-600 text-[10px]" />
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          NEWSLETTER (Suscripciones)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'newsletter' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-10 bg-zinc-950/40 border border-zinc-800 rounded-3xl space-y-6 text-center max-w-3xl mx-auto">
+             <div className="text-5xl mb-4">📧</div>
+             <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Título: Únete al Club" className="w-full bg-transparent text-white font-black text-3xl text-center outline-none" />
+             <input type="text" value={config.subtitle || ''} onChange={e => set('subtitle', e.target.value)} placeholder="Subtítulo corto explicativo" className="w-full bg-transparent text-zinc-500 text-center outline-none" />
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
+                <input type="text" value={config.placeholder || 'Tu email aquí...'} onChange={e => set('placeholder', e.target.value)} className="px-4 py-3 bg-black border border-zinc-800 rounded-xl text-white text-sm" />
+                <input type="text" value={config.btnText || 'Suscribirse'} onChange={e => set('btnText', e.target.value)} className="px-4 py-3 bg-purple-600 text-white font-bold rounded-xl" />
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          COUNTDOWN (Contadores Regresivos)
+      ══════════════════════════════════════════════ */}
+      {mod.type === 'countdown' && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-8 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6 max-w-2xl mx-auto">
+             <h4 className="text-center font-bold text-white text-sm uppercase tracking-widest">⏱️ Configura la Cuenta Atrás</h4>
+             <div className="space-y-4">
+                <input type="text" value={config.title || ''} onChange={e => set('title', e.target.value)} placeholder="Título del evento" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-black text-xl text-center" />
+                <div>
+                   <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black text-center">Fecha y Hora de Finalización</label>
+                   <input type="datetime-local" value={config.endDate || ''} onChange={e => set('endDate', e.target.value)} className="w-full px-4 py-4 bg-black border border-zinc-800 rounded-2xl text-white font-mono text-center" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <input type="text" value={config.btnText || ''} onChange={e => set('btnText', e.target.value)} placeholder="Texto del Botón" className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+                   <input type="text" value={config.btnUrl || ''} onChange={e => set('btnUrl', e.target.value)} placeholder="URL del Botón" className="w-full px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-500 text-[10px]" />
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          DEFAULT / GENERIC CONFIG
+      ══════════════════════════════════════════════ */}
+      {!['navbar','hero','features','pricing','contact','booking','footer','announcement','gallery','team','stats', 'schedule', 'faq', 'steps', 'video', 'image_text', 'newsletter', 'countdown'].includes(mod.type) && (
+        <div className="space-y-6">
+          <StyleSection config={config} onChange={set} />
+          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-4">
+            <div className="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6">⚙️</div>
+            <h4 className="text-center text-white font-black text-xl uppercase tracking-widest mb-10">Módulo: {mod.type}</h4>
+            <div className="p-4 bg-yellow-900/10 border border-yellow-700/30 rounded-xl text-yellow-500 text-xs text-center leading-relaxed italic">
+              Este módulo se edita mediante JSON directo en la base de datos hasta que su interfaz maestra esté finalizada. <br /> Sin embargo, puedes cambiar el estilo visual arriba.
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════
-          STEPS / VIDEO / NEWSLETTER / COUNTDOWN
+          BOTÓN DE GUARDADO FLOTANTE (Premium UI)
       ══════════════════════════════════════════════ */}
-      {(mod.type === 'steps' || mod.type === 'video' || mod.type === 'newsletter' || mod.type === 'countdown') && (
-        <>
-          <StyleSection config={config} onChange={set} />
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">⚙️ Configuración {mod.type}</h4>
-            {mod.type === 'video' && (
-              <input type="text" value={config.videoUrl} onChange={e => set('videoUrl', e.target.value)} placeholder="URL Video (Youtube Embed)" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
-            )}
-            {mod.type === 'countdown' && (
-              <input type="date" value={config.targetDate} onChange={e => set('targetDate', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white shadow-inner appearance-none" />
-            )}
-            {mod.type === 'steps' && (
-              <div className="space-y-3">
-                {(config.steps || []).map((s: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl space-y-2">
-                    <input type="text" value={s.title} onChange={e => handleArrayChange('steps', idx, 'title', e.target.value)} placeholder="Título Paso" className="w-full px-2 py-1 bg-black text-white text-sm font-bold rounded" />
-                    <textarea value={s.description} onChange={e => handleArrayChange('steps', idx, 'description', e.target.value)} placeholder="Descripción Paso" className="w-full px-2 py-1 bg-black text-white text-xs rounded resize-none" />
-                  </div>
-                ))}
-                <button onClick={() => addArrayItem('steps', { title: 'Nuevo Paso', description: 'Explica qué hay que hacer' })} className="w-full py-2 border border-zinc-800 border-dashed rounded-xl text-xs text-zinc-500 hover:bg-zinc-800">+ Añadir Paso</button>
-              </div>
-            )}
-            {mod.type === 'newsletter' && (
-              <div className="space-y-3">
-                <input type="text" value={config.title} onChange={e => set('title', e.target.value)} placeholder="Título" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
-                <input type="text" value={config.btnText} onChange={e => set('btnText', e.target.value)} placeholder="Texto Botón" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          IMAGE + TEXT / TEXT COLUMNS / SOCIAL / BOOKING / FOOTER
-      ══════════════════════════════════════════════ */}
-      {(mod.type === 'image_text' || mod.type === 'text_columns' || mod.type === 'social_links' || mod.type === 'booking' || mod.type === 'footer') && (
-        <>
-          {mod.type !== 'footer' && <StyleSection config={config} onChange={set} />}
-          <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-5">
-            <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🔗 Configuración Avanzada</h4>
-            {mod.type === 'image_text' && (
-              <div className="space-y-3">
-                <input type="text" value={config.imageUrl} onChange={e => set('imageUrl', e.target.value)} placeholder="URL Imagen" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
-                <select value={config.layout} onChange={e => set('layout', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white">
-                  <option value="image_left">Imagen a la Izquierda</option>
-                  <option value="image_right">Imagen a la Derecha</option>
-                </select>
-                <input type="text" value={config.title} onChange={e => set('title', e.target.value)} placeholder="Título" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white" />
-              </div>
-            )}
-            {mod.type === 'text_columns' && (
-              <div className="space-y-3">
-                {(config.columns || []).map((c: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl space-y-2">
-                    <input type="text" value={c.title} onChange={e => handleArrayChange('columns', idx, 'title', e.target.value)} placeholder="Título Columna" className="w-full px-2 py-1 bg-black text-white text-sm font-bold rounded" />
-                    <textarea value={c.text} onChange={e => handleArrayChange('columns', idx, 'text', e.target.value)} placeholder="Texto..." className="w-full px-2 py-1 bg-black text-white text-xs rounded resize-none" />
-                  </div>
-                ))}
-                <button onClick={() => addArrayItem('columns', { title: 'Nueva Columna', text: 'Escribe algo...' })} className="w-full py-2 border border-zinc-800 border-dashed rounded-xl text-xs text-zinc-500 hover:bg-zinc-800">+ Añadir Columna</button>
-              </div>
-            )}
-            {mod.type === 'social_links' && (
-              <div className="grid grid-cols-2 gap-3">
-                {['Instagram','Facebook','TikTok','Twitter','LinkedIn','YouTube'].map(s => (
-                  <div key={s}>
-                    <label className="block text-[10px] text-zinc-500 mb-1 uppercase tracking-wider">{s}</label>
-                    <input type="text" value={config[s.toLowerCase()] || ''} onChange={e => set(s.toLowerCase(), e.target.value)} placeholder="URL..." className="w-full px-3 py-2 bg-black/40 border border-zinc-800 rounded-lg text-white text-xs" />
-                  </div>
-                ))}
-              </div>
-            )}
-            {mod.type === 'booking' && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                   <label className="flex items-center gap-2"><input type="checkbox" checked={config.showWhatsapp} onChange={e => set('showWhatsapp', e.target.checked)} /> <span className="text-xs text-white">WhatsApp</span></label>
-                   <label className="flex items-center gap-2"><input type="checkbox" checked={config.showPhone} onChange={e => set('showPhone', e.target.checked)} /> <span className="text-xs text-white">Teléfono</span></label>
-                </div>
-                <input type="text" value={config.whatsapp} onChange={e => set('whatsapp', e.target.value)} placeholder="Nº WhatsApp" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded text-white text-xs" />
-                <input type="text" value={config.bookingBtnText} onChange={e => set('bookingBtnText', e.target.value)} placeholder="Texto Botón Reserva" className="w-full px-3 py-2 bg-black border border-zinc-800 rounded text-white text-xs" />
-              </div>
-            )}
-            {mod.type === 'footer' && (
-              <div className="space-y-3">
-                <input type="text" value={config.businessName} onChange={e => set('businessName', e.target.value)} placeholder="Nombre del Negocio" className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white font-bold" />
-                <input type="text" value={config.copyrightText} onChange={e => set('copyrightText', e.target.value)} placeholder="Copyright..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* Guardar */}
-      <div className="sticky bottom-0 pt-6 bg-zinc-900/95 backdrop-blur rounded-b-2xl pb-2">
-        <button onClick={handleSave} disabled={isPending}
-          className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-purple-600/30 text-lg">
-          {isPending ? '⏳ Guardando...' : '💾 Guardar y Publicar'}
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+        <button
+          onClick={handleSave}
+          disabled={isPending}
+          className="pointer-events-auto bg-white text-black font-black px-12 py-5 rounded-full shadow-[0_20px_50px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-[0.2em] flex items-center gap-4 group border border-white/50"
+        >
+          {isPending ? (
+            <><div className="w-5 h-5 border-4 border-black border-t-transparent rounded-full animate-spin" /> PROCESANDO...</>
+          ) : (
+            <><span className="text-xl group-hover:rotate-12 transition-transform">💎</span> GUARDAR CONFIGURACIÓN</>
+          )}
         </button>
       </div>
     </div>

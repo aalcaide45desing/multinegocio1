@@ -10,6 +10,14 @@ export default async function EditModulePage({ params }: { params: Promise<{ id:
     redirect("/admin/modules")
   }
 
+  // Recuperar configuración global para sincronización
+  let settings = null
+  try {
+    settings = await (db as any).settings?.findUnique({ where: { id: "global" } })
+  } catch (e) {
+    console.error("No se pudo cargar Settings para el editor de módulos")
+  }
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl">
        <div className="flex items-center gap-4 mb-8">
@@ -30,7 +38,7 @@ export default async function EditModulePage({ params }: { params: Promise<{ id:
             Cualquier cambio se reflejará instantáneamente tras guardar.
           </p>
           
-          <EditModuleClient mod={mod} />
+          <EditModuleClient mod={mod} initialSettings={settings} />
        </div>
     </div>
   )

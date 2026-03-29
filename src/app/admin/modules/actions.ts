@@ -3,6 +3,17 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
+async function triggerVercelRebuild() {
+  const webhookUrl = process.env.VERCEL_DEPLOY_WEBHOOK_URL;
+  if (!webhookUrl) return;
+  try {
+    await fetch(webhookUrl, { method: "POST" });
+    console.log("🚀 Vercel Webhook disparado correctamente.");
+  } catch (err) {
+    console.error("⚠️ Error disparando Webhook de Vercel:", err);
+  }
+}
+
 export async function toggleModuleStatus(id: string, currentStatus: boolean) {
   await db.module.update({ where: { id }, data: { isActive: !currentStatus } })
   revalidatePath("/admin/modules")
@@ -27,14 +38,13 @@ export async function createModule(type: string, name: string, order: number) {
         ],
         bgColor: "#000000", bgOpacity: "solid", textColor: "#ffffff",
         showBorder: false, position: "sticky", layout: "standard",
-        // Paleta de marca global
         brand: {
           primary:    "#7c3aed",
           secondary:  "#06b6d4",
           accent:     "#f59e0b",
           background: "#09090b",
           text:       "#ffffff",
-          applyGlobal: false   // si true, todos los módulos usarán estos colores
+          applyGlobal: false   
         }
       }
       break
@@ -43,6 +53,7 @@ export async function createModule(type: string, name: string, order: number) {
       defaultConfig = {
         preTitleBadge: "", title: "Bienvenidos a Nuestro Negocio",
         subtitle: "Calidad, confianza y buen servicio desde el primer día.",
+        paddingY: "xl", maxWidth: "md",
         textAlign: "center", backgroundImageUrl: "", imageOverlayOpacity: 0.55,
         color: "#1a0533", useGradient: false, gradientColor2: "#0f172a", decoration: "none",
         buttons: [
@@ -55,6 +66,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "features":
       defaultConfig = {
         title: "Nuestros Servicios", subtitle: "Todo lo que necesitas en un solo lugar",
+        paddingY: "md", maxWidth: "md",
         color: "#18181b", decoration: "none", columns: 3, cardStyle: "glass",
         cards: [
           { id: "1", emoji: "✂️", title: "Servicio Premium",  subtitle: "El más elegido",  paragraphs: ["Atención personalizada de calidad."] },
@@ -67,6 +79,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "reviews":
       defaultConfig = {
         title: "Lo que dicen nuestros clientes", color: "#09090b", decoration: "none",
+        paddingY: "md", maxWidth: "md",
         reviews: [
           { id: "1", author: "María G.",   role: "Cliente habitual", rating: 5, text: "Un servicio increíble. Muy recomendable para todo tipo de ocasiones." },
           { id: "2", author: "Carlos M.",  role: "Nuevo cliente",    rating: 5, text: "Quedé encantado con la atención. Volveré sin duda." }
@@ -77,6 +90,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "schedule":
       defaultConfig = {
         title: "Nuestro Horario", color: "#18181b", decoration: "none",
+        paddingY: "md", maxWidth: "md",
         days: [
           { day: "Lunes",     open: "09:00", close: "20:00", closed: false },
           { day: "Martes",    open: "09:00", close: "20:00", closed: false },
@@ -92,6 +106,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "pricing":
       defaultConfig = {
         title: "Tarifas y Precios", color: "#09090b", decoration: "none", currency: "€",
+        paddingY: "md", maxWidth: "md",
         categories: [
           {
             id: "1", name: "Servicios Básicos",
@@ -107,6 +122,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "gallery":
       defaultConfig = {
         title: "Nuestra Galería", subtitle: "Descubre nuestro trabajo",
+        paddingY: "sm", maxWidth: "full",
         color: "#18181b", decoration: "none", columns: 3,
         images: [
           { id: "1", url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80", alt: "Imagen 1" },
@@ -118,6 +134,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "team":
       defaultConfig = {
         title: "Nuestro Equipo", subtitle: "Profesionales apasionados por su trabajo",
+        paddingY: "md", maxWidth: "md",
         color: "#18181b", decoration: "none",
         members: [
           { id: "1", name: "Ana López",   role: "Directora & Especialista", imageUrl: "", bio: "Más de 10 años de experiencia en el sector." },
@@ -129,6 +146,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "stats":
       defaultConfig = {
         color: "#6b21a8", decoration: "blob",
+        paddingY: "sm", maxWidth: "md",
         stats: [
           { id: "1", number: "500+",  label: "Clientes satisfechos" },
           { id: "2", number: "10",    label: "Años de experiencia" },
@@ -143,6 +161,7 @@ export async function createModule(type: string, name: string, order: number) {
         badgeText: "🔥 OFERTA LIMITADA",
         title: "¡Reserva esta semana con un 10% de descuento!",
         subtitle: "Solo por tiempo limitado. No pierdas esta oportunidad.",
+        paddingY: "md", maxWidth: "md",
         color: "#1a0533", decoration: "blob",
         buttons: [
           { id: "1", text: "Reservar Ahora",  url: "#contacto",  style: "primary" },
@@ -154,6 +173,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "steps":
       defaultConfig = {
         title: "¿Cómo funciona?", subtitle: "Sencillo y rápido",
+        paddingY: "md", maxWidth: "md",
         color: "#18181b", decoration: "none",
         steps: [
           { id: "1", number: "01", title: "Contacta con nosotros",  description: "Llámanos, escríbenos o reserva directamente online." },
@@ -166,6 +186,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "booking":
       defaultConfig = {
         title: "Reserva tu Cita", subtitle: "Estamos aquí para atenderte. Elige cómo contactarte.",
+        paddingY: "md", maxWidth: "md",
         color: "#1a0533", decoration: "blob",
         showPhone: true, phone: "+34 600 000 000",
         showWhatsapp: true, whatsapp: "+34 600 000 000",
@@ -178,6 +199,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "contact":
       defaultConfig = {
         title: "Contacta con nosotros", color: "#18181b", decoration: "none",
+        paddingY: "md", maxWidth: "md",
         email: "info@tuempresa.com", phone: "+34 600 000 000",
         showWhatsapp: false, whatsapp: "",
         address: "", mapEmbedUrl: "",
@@ -188,6 +210,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "faq":
       defaultConfig = {
         title: "Preguntas Frecuentes", color: "#09090b", decoration: "none",
+        paddingY: "md", maxWidth: "md",
         accentColor: "#a855f7",
         faqs: [
           { id: "1", question: "¿Necesito reserva previa?",         answer: "Recomendamos reservar con antelación, aunque también atendemos sin cita según disponibilidad." },
@@ -214,16 +237,18 @@ export async function createModule(type: string, name: string, order: number) {
     case "video":
       defaultConfig = {
         title: "Conócenos Mejor", subtitle: "Un vistazo a lo que hacemos",
+        paddingY: "md",
         color: "#09090b", decoration: "none",
         videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        aspectRatio: "16/9", maxWidth: "900"
+        aspectRatio: "16/9", maxWidth: "md"
       }
       break
 
     case "image_text":
       defaultConfig = {
         color: "#18181b", decoration: "none",
-        layout: "image_left",   // image_left | image_right
+        paddingY: "md", maxWidth: "md",
+        layout: "image_left",   
         imageUrl: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
         imageAlt: "Imagen descriptiva",
         badge: "", title: "Sobre Nosotros",
@@ -239,6 +264,7 @@ export async function createModule(type: string, name: string, order: number) {
       defaultConfig = {
         title: "¡No te pierdas nada!",
         subtitle: "Suscríbete para recibir nuestras últimas noticias y ofertas exclusivas.",
+        paddingY: "md", maxWidth: "md",
         placeholder: "Tu correo electrónico",
         btnText: "Suscribirme",
         disclaimer: "Respetamos tu privacidad. Puedes darte de baja en cualquier momento.",
@@ -249,6 +275,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "countdown":
       defaultConfig = {
         title: "La Gran Apertura", subtitle: "Prepárate para algo increíble",
+        paddingY: "md", maxWidth: "md",
         targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         btnText: "Avisarme", btnUrl: "#contacto",
         color: "#09090b", decoration: "grid"
@@ -258,6 +285,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "social_links":
       defaultConfig = {
         title: "Síguenos en Redes", subtitle: "Estamos donde tú estás",
+        paddingY: "sm", maxWidth: "md",
         color: "#18181b", decoration: "none",
         socials: [
           { id: "1", platform: "instagram", url: "", label: "@miempresa" },
@@ -270,6 +298,7 @@ export async function createModule(type: string, name: string, order: number) {
     case "text_columns":
       defaultConfig = {
         color: "#18181b", decoration: "none",
+        paddingY: "md", maxWidth: "md",
         title: "Información Importante", columns: 2,
         blocks: [
           { id: "1", title: "Nuestra Misión",  body: "Ofrecer el mejor servicio de la zona con profesionalidad y calidez humana." },
@@ -307,6 +336,7 @@ export async function updateModuleConfig(id: string, newConfig: any) {
   revalidatePath("/admin/modules")
   revalidatePath(`/admin/modules/${id}`)
   revalidatePath("/")
+  await triggerVercelRebuild()
 }
 
 export async function swapModuleOrder(idA: string, orderA: number, idB: string, orderB: number) {

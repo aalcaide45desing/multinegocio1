@@ -9,8 +9,8 @@ export default function Sidebar() {
   const links = [
     { href: "/admin/dashboard", label: "Vista General", icon: "🎯" },
     { href: "/admin/modules", label: "Gestión de Módulos", icon: "🧩" },
+    { href: "/admin/settings", label: "Identidad de Marca", icon: "⚙️" },
     { href: "#", label: "Usuarios", icon: "👥" },
-    { href: "#", label: "Identidad de Marca", icon: "⚙️" },
   ]
 
   return (

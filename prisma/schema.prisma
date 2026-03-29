@@ -78,3 +78,27 @@ model Module {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// Global Brand and Environment settings
+model Settings {
+  id               String   @id @default("global")
+  siteTitle        String   @default("Mi Negocio")
+  siteDescription String   @default("Descripción de mi negocio")
+  faviconUrl       String?
+  ogImageUrl       String?
+  logoUrl          String?
+  primaryColor     String   @default("#7c3aed")
+  secondaryColor   String   @default("#06b6d4")
+  backgroundColor  String   @default("#000000")
+  businessName     String?
+  contactEmail     String?
+  contactPhone     String?      // Mantener por retrocompatibilidad
+  contactPhones    Json?        // Nuevo: Array de teléfonos ["+34...", "+34..."]
+  address          String?
+  city             String?
+  province         String?
+  country          String?
+  locationMapUrl   String?      // URL de Google Maps o similar
+  
+  updatedAt        DateTime @updatedAt
+}
