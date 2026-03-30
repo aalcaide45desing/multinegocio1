@@ -27,29 +27,81 @@ function Stars({ n }: { n: number }) {
   return <span className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => <span key={i} className={i < n ? 'text-yellow-400' : 'text-zinc-700'}>★</span>)}</span>
 }
 
-// ─── Botones genéricos ───────────────────────────────────────────────────────
+// ─── Sistema de Botones con Diseños Preestablecidos ──────────────────────────
+const BTN_PRESETS: Record<string, (primaryBg: string, primaryText: string, customColor?: string) => { className: string; style?: React.CSSProperties }> = {
+  // 1. Sólido clásico (el más usado)
+  'primary': (bg, text) => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl',
+    style: { backgroundColor: bg, color: text }
+  }),
+  // 2. Contorno elegante
+  'outline': (bg) => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest rounded-full border-2 transition-all duration-300 hover:scale-105 active:scale-95 text-white hover:bg-white/10',
+    style: { borderColor: bg + '80', color: '#fff' }
+  }),
+  // 3. Fantasma / limpio
+  'ghost': () => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 text-white/60 hover:text-white hover:bg-white/5 rounded-full',
+  }),
+  // 4. Destello brillante (Glow)
+  'glow': (bg, text) => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-110 active:scale-95',
+    style: { backgroundColor: bg, color: text, boxShadow: `0 0 30px ${bg}88, 0 0 60px ${bg}44` }
+  }),
+  // 5. Píldora sólida (bordes muy grandes)
+  'pill': (bg, text) => ({
+    className: 'px-10 py-5 font-black uppercase tracking-[0.2em] rounded-[100px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl',
+    style: { backgroundColor: bg, color: text }
+  }),
+  // 6. Píldora con contorno
+  'pill-outline': (bg) => ({
+    className: 'px-10 py-5 font-black uppercase tracking-[0.2em] rounded-[100px] border-2 transition-all duration-300 hover:scale-105 text-white',
+    style: { borderColor: bg }
+  }),
+  // 7. Neón (texto de color con borde brillante)
+  'neon': (bg) => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg',
+    style: { borderColor: bg, color: bg, textShadow: `0 0 10px ${bg}`, boxShadow: `inset 0 0 15px ${bg}22` }
+  }),
+  // 8. Cristal (glassmorphism)
+  'glass': () => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest rounded-xl border border-white/20 bg-white/10 backdrop-blur-md text-white transition-all duration-300 hover:scale-105 hover:bg-white/20 shadow-xl',
+  }),
+  // 9. Minimal con flecha
+  'minimal': (bg) => ({
+    className: 'px-2 py-2 font-black uppercase tracking-widest text-sm border-b-2 transition-all duration-300 hover:px-4 hover:tracking-[0.3em] text-white',
+    style: { borderColor: bg }
+  }),
+  // 10. Degradado
+  'gradient': (bg, _, custom) => ({
+    className: 'px-8 py-4 font-black uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-105 active:scale-95 shadow-xl text-white',
+    style: { background: `linear-gradient(135deg, ${bg}, ${custom || '#06b6d4'})` }
+  }),
+}
+
 function Buttons({ buttons, config, size = 'lg' }: { buttons?: any[]; config: any; size?: 'sm' | 'lg' }) {
   if (!buttons?.length) return null
-  const base = size === 'lg' ? 'px-8 py-4 text-sm sm:text-base font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 active:scale-95 shadow-xl' : 'px-5 py-2.5 text-xs font-bold rounded-full transition-all hover:opacity-80'
   
-  const primaryBg = config._global ? 'var(--brand-primary)' : (config.brandColor || '#ffffff')
+  const primaryBg = config._global ? 'var(--brand-primary)' : (config.accentColor || config.brandColor || '#a855f7')
   const primaryText = config._global ? 'var(--brand-bg)' : '#000000'
+  const sizeClass = size === 'lg' ? 'text-sm sm:text-base' : 'text-xs'
 
   return (
     <div className="flex flex-wrap gap-4">
       {buttons.map((btn: any) => {
-        const s = btn.style
-        if (s === 'outline' || s === 'outlined') {
-          return <a key={btn.id} href={btn.url || '#'} className={`${base} border-2 border-white/40 text-white hover:bg-white/10 hover:border-white shadow-xl`}>{btn.text}</a>
-        }
-        if (s === 'ghost') {
-          return <a key={btn.id} href={btn.url || '#'} className={`${base} text-white/70 hover:text-white hover:bg-white/5`}>{btn.text}</a>
-        }
-        return <a key={btn.id} href={btn.url || '#'} className={base} style={{ backgroundColor: primaryBg, color: primaryText }}>{btn.text}</a>
+        const preset = BTN_PRESETS[btn.style] || BTN_PRESETS['primary']
+        const { className, style } = preset(primaryBg, primaryText, btn.customColor)
+        return (
+          <a key={btn.id} href={btn.url || '#'} className={`${className} ${sizeClass}`} style={style}>
+            {btn.text}
+            {btn.style === 'minimal' && <span className="ml-2">→</span>}
+          </a>
+        )
       })}
     </div>
   )
 }
+
 
 // ─── Mapeos de Tamaño ───────────────────────────────────────────────────────
 const PADDING_Y: Record<string, string> = {

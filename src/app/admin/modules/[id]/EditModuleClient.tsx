@@ -543,6 +543,116 @@ function useArrayHelpers(config: any, setConfig: React.Dispatch<React.SetStateAc
   return { handleArrayChange, addArrayItem, removeArrayItem, handleDayIntervalChange, addDayInterval, removeDayInterval }
 }
 
+// ─── Editor de Botones Reutilizable ───────────────────────────────────────────
+const BUTTON_PRESETS = [
+  { k: 'primary',      icon: '⬛', label: 'Sólido',       desc: 'Clásico y efectivo' },
+  { k: 'outline',      icon: '⬜', label: 'Contorno',      desc: 'Elegante y ligero' },
+  { k: 'ghost',        icon: '👻', label: 'Fantasma',      desc: 'Sutil y limpio' },
+  { k: 'glow',         icon: '✨', label: 'Glow',          desc: 'Efecto brillante' },
+  { k: 'pill',         icon: '💊', label: 'Píldora',       desc: 'Bordes máximos' },
+  { k: 'pill-outline', icon: '○',  label: 'Píldora Borde', desc: 'Abierto y moderno' },
+  { k: 'neon',         icon: '🌟', label: 'Neón',          desc: 'Futurista' },
+  { k: 'glass',        icon: '🔷', label: 'Cristal',       desc: 'Glassmorphism' },
+  { k: 'minimal',      icon: '→',  label: 'Minimal',       desc: 'Solo texto + flecha' },
+  { k: 'gradient',     icon: '🌈', label: 'Degradado',     desc: 'Dos colores' },
+]
+
+function ButtonsEditor({ config, onChange }: { config: any; onChange: (key: string, val: any) => void }) {
+  const buttons: any[] = config.buttons || []
+  
+  const addBtn = () => {
+    const newBtn = { id: Math.random().toString(36).slice(2), text: 'Llamada a la acción', url: '#', style: 'primary' }
+    onChange('buttons', [...buttons, newBtn])
+  }
+  
+  const removeBtn = (i: number) => {
+    const nb = [...buttons]; nb.splice(i, 1); onChange('buttons', nb)
+  }
+  
+  const updateBtn = (i: number, field: string, val: string) => {
+    const nb = [...buttons]; nb[i] = { ...nb[i], [field]: val }; onChange('buttons', nb)
+  }
+
+  return (
+    <div className="border border-zinc-800 rounded-2xl overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 bg-zinc-900/60">
+        <div className="flex items-center gap-3">
+          <span className="text-xl">🖱️</span>
+          <span className="font-bold text-white text-sm uppercase tracking-wider">Botones CTA</span>
+          <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-[10px] font-mono">{buttons.length} botones</span>
+        </div>
+        <button type="button" onClick={addBtn}
+          className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors">
+          + Botón
+        </button>
+      </div>
+      
+      {buttons.length === 0 && (
+        <div className="px-5 py-8 text-center bg-zinc-950/40">
+          <p className="text-zinc-600 text-xs mb-3">Sin botones aún. Añade uno para que los visitantes puedan actuar.</p>
+          <button type="button" onClick={addBtn}
+            className="px-6 py-2.5 border border-dashed border-zinc-700 text-zinc-500 text-xs font-bold rounded-xl hover:border-purple-500 hover:text-purple-400 transition-all">
+            + Añadir primer botón
+          </button>
+        </div>
+      )}
+      
+      <div className="divide-y divide-zinc-800/50">
+        {buttons.map((btn: any, i: number) => (
+          <div key={btn.id || i} className="p-5 bg-zinc-950/40 space-y-4">
+            {/* Fila superior: texto + URL + eliminar */}
+            <div className="flex gap-3 items-center">
+              <input type="text" value={btn.text || ''} onChange={e => updateBtn(i, 'text', e.target.value)}
+                placeholder="Texto del botón"
+                className="flex-1 px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white font-bold text-sm focus:border-purple-500 outline-none" />
+              <input type="text" value={btn.url || ''} onChange={e => updateBtn(i, 'url', e.target.value)}
+                placeholder="https://... o #seccion"
+                className="flex-1 px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 text-xs focus:border-purple-500 outline-none" />
+              <button type="button" onClick={() => removeBtn(i)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0">✕</button>
+            </div>
+            
+            {/* Selector visual de preset */}
+            <div>
+              <p className="text-[10px] text-zinc-500 uppercase font-black mb-2">Diseño Preestablecido</p>
+              <div className="grid grid-cols-5 gap-1.5">
+                {BUTTON_PRESETS.map(preset => (
+                  <button key={preset.k} type="button"
+                    title={preset.desc}
+                    onClick={() => updateBtn(i, 'style', preset.k)}
+                    className={`flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl border text-center transition-all ${
+                      btn.style === preset.k
+                        ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                        : 'border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                    }`}>
+                    <span className="text-base leading-none">{preset.icon}</span>
+                    <span className="text-[8px] font-bold uppercase leading-none mt-0.5">{preset.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Color degradado si aplica */}
+            {btn.style === 'gradient' && (
+              <div>
+                <p className="text-[10px] text-zinc-500 uppercase font-black mb-2">Color Secundario del Degradado</p>
+                <div className="flex gap-2 items-center">
+                  <input type="color" value={btn.customColor || '#06b6d4'} onChange={e => updateBtn(i, 'customColor', e.target.value)}
+                    className="w-10 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+                  <input type="text" value={btn.customColor || '#06b6d4'} onChange={e => updateBtn(i, 'customColor', e.target.value)}
+                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+
+
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function EditModuleClient({ mod, initialSettings }: { mod: any; initialSettings?: any }) {
   const router = useRouter()
@@ -691,29 +801,11 @@ export default function EditModuleClient({ mod, initialSettings }: { mod: any; i
               </div>
             </div>
 
-            <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
-               <div className="flex justify-between items-center mb-4">
-                  <h5 className="font-semibold text-white text-sm uppercase tracking-widest">Botones de Llamada a la Acción</h5>
-                    <button onClick={() => addArrayItem('buttons', { text: 'Saber más', url: '#', style: 'primary' })} className="text-[10px] bg-zinc-800 px-3 py-1 rounded-lg border border-zinc-700 text-white font-bold">+ Botón</button>
-                 </div>
-                 <div className="space-y-3">
-                   {(config.buttons || []).map((btn: any, idx: number) => (
-                      <div key={idx} className="flex gap-2 items-center bg-black/40 p-2 rounded-xl border border-zinc-800">
-                        <input type="text" value={btn.text} onChange={e => handleArrayChange('buttons', idx, 'text', e.target.value)} placeholder="Texto" className="w-1/3 px-2 py-1 bg-transparent text-white text-[10px] font-bold border-r border-zinc-800" />
-                        <input type="text" value={btn.url} onChange={e => handleArrayChange('buttons', idx, 'url', e.target.value)} placeholder="URL" className="flex-1 px-2 py-1 bg-transparent text-zinc-500 text-[10px]" />
-                        <select value={btn.style} onChange={e => handleArrayChange('buttons', idx, 'style', e.target.value)} className="bg-transparent text-[9px] text-purple-400 font-bold outline-none">
-                          <option value="primary">Primario</option>
-                          <option value="outline">Borde</option>
-                          <option value="ghost">Limpio</option>
-                        </select>
-                        <button onClick={() => removeArrayItem('buttons', idx)} className="text-zinc-700 hover:text-red-500 px-1">✕</button>
-                      </div>
-                   ))}
-                 </div>
-               </div>
-            </div>
+            <ButtonsEditor config={config} onChange={set} />
           </div>
+        </div>
       )}
+
 
       {/* ══════════════════════════════════════════════
           FEATURES (Servicios / Beneficios)
