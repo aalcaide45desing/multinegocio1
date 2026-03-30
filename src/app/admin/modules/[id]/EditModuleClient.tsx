@@ -4,249 +4,395 @@ import { useState, useTransition, useEffect, useRef } from "react"
 import { updateModuleConfig } from "../actions"
 import { useRouter } from "next/navigation"
 
-// ─── Sección reutilizable de Color + Decoración + Tipografía ──────────────────
-function StyleSection({ config, onChange }: { config: any; onChange: (key: string, val: any) => void }) {
+// ─── Acordeón Colapsable ──────────────────────────────────────────────────────
+function Accordion({ id, icon, title, badge, children, defaultOpen = false }: {
+  id: string; icon: string; title: string; badge?: string; children: React.ReactNode; defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
-    <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
-      <div className="flex justify-between items-center">
-        <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🎨 Estilo y Tamaño</h4>
-        <div className="flex gap-2">
-          <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase tracking-widest border border-purple-500/30">Personalización Pro</span>
+    <div className="border border-zinc-800 rounded-2xl overflow-hidden">
+      <button type="button" onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-5 py-4 bg-zinc-900/60 hover:bg-zinc-900 transition-colors group">
+        <div className="flex items-center gap-3">
+          <span className="text-xl">{icon}</span>
+          <span className="font-bold text-white text-sm uppercase tracking-wider">{title}</span>
+          {badge && (
+            <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-[10px] font-mono truncate max-w-[120px]">{badge}</span>
+          )}
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1">Color de fondo</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Define el color principal de esta sección. Haz clic en el cuadro para abrir el selector.</p>
-          <div className="flex gap-3 items-center">
-            <input type="color" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
-              className="w-14 h-14 p-1 rounded-xl cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0 hover:scale-105 transition-transform" />
-            <input type="text" value={config.color || '#18181b'} onChange={e => onChange('color', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white uppercase font-mono tracking-widest text-xs" />
-          </div>
+        <span className={`text-zinc-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+      {open && (
+        <div className="p-5 space-y-5 bg-zinc-950/40 border-t border-zinc-800">
+          {children}
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1">Espaciado Vertical (px)</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Espacio vacío (aire) arriba y abajo del contenido. Pon 0 para que el contenido toque los bordes.</p>
-          <div className="flex gap-3 items-center">
-            <input type="number" min="0" step="8" value={config.paddingYPx ?? ''} 
-              onChange={e => onChange('paddingYPx', e.target.value === '' ? null : parseInt(e.target.value))}
-              placeholder="Auto" 
-              className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
-            <span className="text-zinc-600 text-xs font-bold">px</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1">Ancho de Contenido</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Define cuánto espacio horizontal ocupa el contenido. "Pantalla Completa" elimina márgenes laterales.</p>
-          <select value={config.maxWidth || 'md'} onChange={e => onChange('maxWidth', e.target.value)}
-            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-            <option value="sm">Estrecho (Lectura cómoda)</option>
-            <option value="md">Estándar (Recomendado)</option>
-            <option value="lg">Ancho (Más contenido visible)</option>
-            <option value="xl">Extra ancho</option>
-            <option value="full">Pantalla Completa</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-purple-400 mb-1">✨ Decoración de Fondo</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Añade un efecto visual decorativo detrás del contenido para darle personalidad.</p>
-          <select value={config.decoration || 'none'} onChange={e => onChange('decoration', e.target.value)}
-            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-            <option value="none">Ninguna (Liso)</option>
-            <option value="waves">Olas suaves</option>
-            <option value="blob">Burbuja abstracta</option>
-            <option value="grid">Cuadrícula técnica</option>
-          </select>
-        </div>
-      </div>
-
-      {/* ── Layout y Alineación ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <label className="block text-xs font-bold text-zinc-400 mb-1">Alineación del Texto</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Controla la alineación de todo el texto dentro de esta sección.</p>
-          <select value={config.textAlign || 'center'} onChange={e => onChange('textAlign', e.target.value)}
-            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-            <option value="left">⬅ Izquierda</option>
-            <option value="center">⬛ Centro (Recomendado)</option>
-            <option value="right">➡ Derecha</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-zinc-400 mb-1">Padding Horizontal (px)</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Espacio a los lados del contenido. Déjalo vacío para automático.</p>
-          <div className="flex gap-3 items-center">
-            <input type="number" min="0" step="8" value={config.paddingXPx ?? ''} 
-              onChange={e => onChange('paddingXPx', e.target.value === '' ? null : parseInt(e.target.value))}
-              placeholder="Auto" 
-              className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
-            <span className="text-zinc-600 text-xs font-bold">px</span>
-          </div>
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-zinc-400 mb-1">Margen Superior (px)</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Espacio extra antes de este módulo (separa del anterior).</p>
-          <div className="flex gap-3 items-center">
-            <input type="number" min="0" step="4" value={config.marginTopPx ?? ''} 
-              onChange={e => onChange('marginTopPx', e.target.value === '' ? null : parseInt(e.target.value))}
-              placeholder="0" 
-              className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
-            <span className="text-zinc-600 text-xs font-bold">px</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Tipografía ── */}
-      <div className="border-t border-zinc-800 pt-6">
-        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">🔤 Tipografía</h4>
-        <p className="text-[10px] text-zinc-600 mb-4">Controla el tamaño de las letras en esta sección. Los tamaños son responsive (se adaptan en móvil).</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño del Título</label>
-            <p className="text-[10px] text-zinc-600 mb-2">El encabezado principal de esta sección.</p>
-            <select value={config.titleSize || 'lg'} onChange={e => onChange('titleSize', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="xs">XS — Muy pequeño</option>
-              <option value="sm">S — Pequeño</option>
-              <option value="md">M — Mediano</option>
-              <option value="lg">L — Grande (Recomendado)</option>
-              <option value="xl">XL — Muy grande</option>
-              <option value="2xl">2XL — Impacto máximo</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño del Subtítulo</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Texto secundario debajo del título.</p>
-            <select value={config.subtitleSize || 'md'} onChange={e => onChange('subtitleSize', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="xs">XS — Muy pequeño</option>
-              <option value="sm">S — Pequeño</option>
-              <option value="md">M — Mediano (Recomendado)</option>
-              <option value="lg">L — Grande</option>
-              <option value="xl">XL — Muy grande</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño del Cuerpo</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Texto de párrafos, descripciones y contenido general.</p>
-            <select value={config.bodySize || 'md'} onChange={e => onChange('bodySize', e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-              <option value="xs">XS — Muy pequeño</option>
-              <option value="sm">S — Pequeño</option>
-              <option value="md">M — Mediano (Recomendado)</option>
-              <option value="lg">L — Grande</option>
-              <option value="xl">XL — Muy grande</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Fuente y Estilo con Buscador + Preview ── */}
-      <div className="border-t border-zinc-800 pt-6">
-        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">✍️ Fuente y Estilo</h4>
-        <p className="text-[10px] text-zinc-600 mb-4">Elige la familia tipográfica y el peso visual del texto en esta sección.</p>
-        <div className="space-y-4">
-          <FontPicker value={config.fontFamily || ''} onChange={(v: string) => onChange('fontFamily', v)} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1">Peso del Título</label>
-              <p className="text-[10px] text-zinc-600 mb-2">Controla lo "grueso" o fino que se ve el título.</p>
-              <select value={config.titleWeight || 'black'} onChange={e => onChange('titleWeight', e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-                <option value="light">Light — Fino y elegante</option>
-                <option value="normal">Normal — Estándar</option>
-                <option value="semibold">Semibold — Semi-negrita</option>
-                <option value="bold">Bold — Negrita</option>
-                <option value="extrabold">Extrabold — Muy negrita</option>
-                <option value="black">Black — Ultra negrita (Recomendado)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1">Estilo del Título</label>
-              <p className="text-[10px] text-zinc-600 mb-2">Normal o inclinado (cursiva/itálica).</p>
-              <select value={config.titleStyle || 'normal'} onChange={e => onChange('titleStyle', e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-                <option value="normal">Normal (Recto)</option>
-                <option value="italic">Cursiva (Itálica)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Dimensiones del Módulo ── */}
-      <div className="border-t border-zinc-800 pt-6">
-        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">📐 Dimensiones del Módulo</h4>
-        <p className="text-[10px] text-zinc-600 mb-4">Controla la altura y separación de esta sección.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Alto del Módulo (px)</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Fija la altura exacta de esta sección en píxeles. Déjalo vacío o en 0 para que se adapte al contenido. El contenido se centrará verticalmente.</p>
-            <div className="flex gap-3 items-center">
-              <input type="number" min="0" step="10" value={config.minHeightPx ?? ''} 
-                onChange={e => onChange('minHeightPx', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                placeholder="Ej: 500" 
-                className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
-              <span className="text-zinc-600 text-xs font-bold">px</span>
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">Separación Inferior Extra (px)</label>
-            <p className="text-[10px] text-zinc-600 mb-2">Espacio extra entre este módulo y el siguiente en píxeles. Déjalo en 0 para sin espacio extra.</p>
-            <div className="flex gap-3 items-center">
-              <input type="number" min="0" step="4" value={config.marginBottomPx ?? ''} 
-                onChange={e => onChange('marginBottomPx', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                placeholder="Ej: 32" 
-                className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
-              <span className="text-zinc-600 text-xs font-bold">px</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Fondo del Módulo ── */}
-      <div className="border-t border-zinc-800 pt-6">
-        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">🖼️ Fondo Estilizado</h4>
-        <p className="text-[10px] text-zinc-600 mb-4">Puedes añadir una imagen de fondo a cualquier módulo.</p>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-zinc-400 mb-1">URL Imagen de Fondo</label>
-            <input type="text" value={config.backgroundImageUrl || ''} onChange={e => onChange('backgroundImageUrl', e.target.value)} placeholder="Ej: https://unsplash.com/..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1">Capa de Oscuridad</label>
-              <input type="range" min="0" max="1" step="0.05" value={config.imageOverlayOpacity ?? 0.6} onChange={e => onChange('imageOverlayOpacity', parseFloat(e.target.value))} className="w-full h-8 accent-purple-500 mt-1" />
-              <div className="text-center text-[10px] text-zinc-500">{Math.round((config.imageOverlayOpacity ?? 0.6) * 100)}% Oscuridad</div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño de la Imagen</label>
-              <select value={config.bgSize || 'cover'} onChange={e => onChange('bgSize', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-1">
-                <option value="cover">Rellenar todo (Corta bordes)</option>
-                <option value="contain">Ajustar (Muestra toda la imagen)</option>
-                <option value="auto">Tamaño Original (Sin ajuste)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1">Alineación de Imagen</label>
-              <select value={config.bgPosition || 'center'} onChange={e => onChange('bgPosition', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-1">
-                <option value="center">Centro</option>
-                <option value="top">Arriba</option>
-                <option value="bottom">Abajo</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }
+
+// ─── Mini label + descripción ─────────────────────────────────────────────────
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-xs font-bold text-zinc-400 mb-1">{label}</label>
+      {hint && <p className="text-[10px] text-zinc-600 mb-2">{hint}</p>}
+      {children}
+    </div>
+  )
+}
+
+function PxInput({ value, onChange, placeholder = 'Auto', step = 8 }: {
+  value: number | null | undefined; onChange: (v: number | null) => void; placeholder?: string; step?: number
+}) {
+  return (
+    <div className="flex gap-2 items-center">
+      <input type="number" min="0" step={step}
+        value={value ?? ''}
+        onChange={e => onChange(e.target.value === '' ? null : parseInt(e.target.value))}
+        placeholder={placeholder}
+        className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold focus:border-purple-500 outline-none transition-colors" />
+      <span className="text-zinc-600 text-xs font-bold shrink-0">px</span>
+    </div>
+  )
+}
+
+// ─── Sección reutilizable de Color + Decoración + Tipografía ──────────────────
+function StyleSection({ config, onChange }: { config: any; onChange: (key: string, val: any) => void }) {
+  const bgMode = config.bgMode || 'solid'
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 mb-1">
+        <h4 className="font-black text-white text-sm uppercase tracking-widest">🎛️ Personalización Pro</h4>
+        <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase border border-purple-500/30">Pro</span>
+      </div>
+
+      {/* ════ 1. FONDO ════ */}
+      <Accordion id="bg" icon="🎨" title="Fondo" badge={bgMode} defaultOpen={true}>
+        {/* Selector de modo */}
+        <Field label="Tipo de Fondo">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { k: 'solid',    icon: '⬛', label: 'Sólido'    },
+              { k: 'gradient', icon: '🌈', label: 'Degradado' },
+              { k: 'image',    icon: '🖼️', label: 'Imagen'    },
+              { k: 'animated', icon: '✨', label: 'Animado'   },
+            ].map(opt => (
+              <button key={opt.k} type="button"
+                onClick={() => onChange('bgMode', opt.k)}
+                className={`flex flex-col items-center gap-1 py-3 rounded-xl border text-xs font-bold transition-all ${
+                  bgMode === opt.k
+                    ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                    : 'border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                }`}>
+                <span className="text-lg">{opt.icon}</span>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        {/* === SÓLIDO === */}
+        {bgMode === 'solid' && (
+          <Field label="Color de Fondo" hint="Haz clic en el cuadro para abrir el selector de color.">
+            <div className="flex gap-3 items-center">
+              <input type="color" value={config.color || '#000000'} onChange={e => onChange('color', e.target.value)}
+                className="w-14 h-12 p-1 rounded-xl cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0 hover:scale-105 transition-transform" />
+              <input type="text" value={config.color || '#000000'} onChange={e => onChange('color', e.target.value)}
+                className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white uppercase font-mono tracking-widest text-xs focus:border-purple-500 outline-none" />
+            </div>
+          </Field>
+        )}
+
+        {/* === DEGRADADO === */}
+        {bgMode === 'gradient' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Color Inicio">
+                <div className="flex gap-2 items-center">
+                  <input type="color" value={config.gradientFrom || '#7c3aed'} onChange={e => onChange('gradientFrom', e.target.value)}
+                    className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+                  <input type="text" value={config.gradientFrom || '#7c3aed'} onChange={e => onChange('gradientFrom', e.target.value)}
+                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+                </div>
+              </Field>
+              <Field label="Color Final">
+                <div className="flex gap-2 items-center">
+                  <input type="color" value={config.gradientTo || '#000000'} onChange={e => onChange('gradientTo', e.target.value)}
+                    className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+                  <input type="text" value={config.gradientTo || '#000000'} onChange={e => onChange('gradientTo', e.target.value)}
+                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+                </div>
+              </Field>
+            </div>
+            <Field label="Dirección">
+              <select value={config.gradientDir || 'to bottom'} onChange={e => onChange('gradientDir', e.target.value)}
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold focus:border-purple-500 outline-none">
+                <option value="to bottom">↓ Arriba → Abajo</option>
+                <option value="to right">→ Izquierda → Derecha</option>
+                <option value="to bottom right">↘ Diagonal (↓→)</option>
+                <option value="to bottom left">↙ Diagonal (↓←)</option>
+                <option value="to top">↑ Abajo → Arriba</option>
+                <option value="135deg">🌀 Diagonal 135°</option>
+                <option value="radial">🔵 Radial (desde centro)</option>
+              </select>
+            </Field>
+            {/* Vista previa */}
+            <div className="h-12 rounded-xl border border-zinc-800 overflow-hidden"
+              style={{ background: config.gradientDir === 'radial'
+                ? `radial-gradient(circle, ${config.gradientFrom || '#7c3aed'}, ${config.gradientTo || '#000000'})`
+                : `linear-gradient(${config.gradientDir || 'to bottom'}, ${config.gradientFrom || '#7c3aed'}, ${config.gradientTo || '#000000'})` }} />
+          </div>
+        )}
+
+        {/* === IMAGEN === */}
+        {bgMode === 'image' && (
+          <div className="space-y-4">
+            <Field label="URL de Imagen de Fondo" hint="Pega la URL de la imagen. También puedes pegar un .gif para fondo animado.">
+              <input type="text" value={config.backgroundImageUrl || ''} onChange={e => onChange('backgroundImageUrl', e.target.value)}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs font-mono focus:border-purple-500 outline-none transition-colors" />
+            </Field>
+            <div className="grid grid-cols-3 gap-4">
+              <Field label="Oscuridad">
+                <input type="range" min="0" max="1" step="0.05"
+                  value={config.imageOverlayOpacity ?? 0.5}
+                  onChange={e => onChange('imageOverlayOpacity', parseFloat(e.target.value))}
+                  className="w-full h-2 accent-purple-500 mt-2" />
+                <div className="text-center text-[10px] text-zinc-500 mt-1">{Math.round((config.imageOverlayOpacity ?? 0.5) * 100)}%</div>
+              </Field>
+              <Field label="Tamaño">
+                <select value={config.bgSize || 'cover'} onChange={e => onChange('bgSize', e.target.value)}
+                  className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-1 focus:border-purple-500 outline-none">
+                  <option value="cover">Cubrir todo</option>
+                  <option value="contain">Ajustar</option>
+                  <option value="auto">Tamaño real</option>
+                </select>
+              </Field>
+              <Field label="Posición">
+                <select value={config.bgPosition || 'center'} onChange={e => onChange('bgPosition', e.target.value)}
+                  className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-1 focus:border-purple-500 outline-none">
+                  <option value="center">Centro</option>
+                  <option value="top">Arriba</option>
+                  <option value="bottom">Abajo</option>
+                  <option value="left">Izquierda</option>
+                  <option value="right">Derecha</option>
+                </select>
+              </Field>
+            </div>
+          </div>
+        )}
+
+        {/* === ANIMADO === */}
+        {bgMode === 'animated' && (
+          <div className="space-y-4">
+            <Field label="Animación de Fondo" hint="CSS puro, sin librerías externas. No afecta al rendimiento.">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { k: 'aurora',    icon: '🌌', label: 'Aurora Boreal',   desc: 'Gradiente animado suave' },
+                  { k: 'mesh',      icon: '🕸️', label: 'Malla Pulsante',  desc: 'Cuadrícula con brillo' },
+                  { k: 'glow',      icon: '💜', label: 'Destello Radial',  desc: 'Halo de color giratorio' },
+                  { k: 'particles', icon: '⭐', label: 'Partículas',        desc: 'Puntos flotantes' },
+                  { k: 'waves',     icon: '🌊', label: 'Olas',             desc: 'Olas en la parte baja' },
+                  { k: 'noise',     icon: '📡', label: 'Ruido Digital',    desc: 'Efecto estático suave' },
+                ].map(anim => (
+                  <button key={anim.k} type="button"
+                    onClick={() => onChange('bgAnimation', config.bgAnimation === anim.k ? '' : anim.k)}
+                    className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
+                      config.bgAnimation === anim.k
+                        ? 'border-purple-500 bg-purple-500/20'
+                        : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-600'
+                    }`}>
+                    <span className="text-2xl shrink-0">{anim.icon}</span>
+                    <div>
+                      <p className={`text-xs font-bold ${config.bgAnimation === anim.k ? 'text-purple-300' : 'text-white'}`}>{anim.label}</p>
+                      <p className="text-[10px] text-zinc-500">{anim.desc}</p>
+                    </div>
+                    {config.bgAnimation === anim.k && <span className="ml-auto text-purple-400 text-xs font-black shrink-0">✓</span>}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Color Principal">
+                <div className="flex gap-2 items-center">
+                  <input type="color" value={config.animColor1 || '#7c3aed'} onChange={e => onChange('animColor1', e.target.value)}
+                    className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+                  <input type="text" value={config.animColor1 || '#7c3aed'} onChange={e => onChange('animColor1', e.target.value)}
+                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+                </div>
+              </Field>
+              <Field label="Color Secundario">
+                <div className="flex gap-2 items-center">
+                  <input type="color" value={config.animColor2 || '#000000'} onChange={e => onChange('animColor2', e.target.value)}
+                    className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+                  <input type="text" value={config.animColor2 || '#000000'} onChange={e => onChange('animColor2', e.target.value)}
+                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+                </div>
+              </Field>
+            </div>
+          </div>
+        )}
+      </Accordion>
+
+      {/* ════ 2. TAMAÑO Y ESPACIO ════ */}
+      <Accordion id="size" icon="📐" title="Tamaño y Espacio">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Alto Mínimo (px)" hint="0 = adapta al contenido">
+            <PxInput value={config.minHeightPx} onChange={v => onChange('minHeightPx', v ?? 0)} placeholder="Auto" step={10} />
+          </Field>
+          <Field label="Ancho del Contenido">
+            <select value={config.maxWidth || 'md'} onChange={e => onChange('maxWidth', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold focus:border-purple-500 outline-none">
+              <option value="sm">Estrecho — Lectura</option>
+              <option value="md">Estándar ✓</option>
+              <option value="lg">Ancho</option>
+              <option value="xl">Extra ancho</option>
+              <option value="full">Pantalla completa</option>
+            </select>
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Padding Vertical (px)" hint="Espacio arriba y abajo del contenido">
+            <PxInput value={config.paddingYPx} onChange={v => onChange('paddingYPx', v)} />
+          </Field>
+          <Field label="Padding Horizontal (px)" hint="Espacio a los lados del contenido">
+            <PxInput value={config.paddingXPx} onChange={v => onChange('paddingXPx', v)} />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Margen Superior (px)" hint="Separación del módulo anterior">
+            <PxInput value={config.marginTopPx} onChange={v => onChange('marginTopPx', v)} placeholder="0" step={4} />
+          </Field>
+          <Field label="Margen Inferior (px)" hint="Separación del módulo siguiente">
+            <PxInput value={config.marginBottomPx} onChange={v => onChange('marginBottomPx', v)} placeholder="0" step={4} />
+          </Field>
+        </div>
+        <Field label="Alineación del Contenido">
+          <div className="grid grid-cols-3 gap-2">
+            {[{ v: 'left', icon: '⬅', label: 'Izquierda' }, { v: 'center', icon: '⬛', label: 'Centro' }, { v: 'right', icon: '➡', label: 'Derecha' }].map(opt => (
+              <button key={opt.v} type="button" onClick={() => onChange('textAlign', opt.v)}
+                className={`py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                  (config.textAlign || 'center') === opt.v
+                    ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                    : 'border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:border-zinc-600'
+                }`}>
+                {opt.icon} {opt.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+      </Accordion>
+
+      {/* ════ 3. TIPOGRAFÍA ════ */}
+      <Accordion id="typo" icon="✍️" title="Tipografía" badge={config.fontFamily || 'Sistema'}>
+        <FontPicker value={config.fontFamily || ''} onChange={(v: string) => onChange('fontFamily', v)} />
+        <div className="grid grid-cols-3 gap-4">
+          <Field label="Título">
+            <select value={config.titleSize || 'lg'} onChange={e => onChange('titleSize', e.target.value)}
+              className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs font-bold focus:border-purple-500 outline-none">
+              <option value="xs">XS</option>
+              <option value="sm">S</option>
+              <option value="md">M</option>
+              <option value="lg">L ✓</option>
+              <option value="xl">XL</option>
+              <option value="2xl">2XL</option>
+            </select>
+          </Field>
+          <Field label="Subtítulo">
+            <select value={config.subtitleSize || 'md'} onChange={e => onChange('subtitleSize', e.target.value)}
+              className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs font-bold focus:border-purple-500 outline-none">
+              <option value="xs">XS</option>
+              <option value="sm">S</option>
+              <option value="md">M ✓</option>
+              <option value="lg">L</option>
+              <option value="xl">XL</option>
+            </select>
+          </Field>
+          <Field label="Cuerpo">
+            <select value={config.bodySize || 'md'} onChange={e => onChange('bodySize', e.target.value)}
+              className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs font-bold focus:border-purple-500 outline-none">
+              <option value="xs">XS</option>
+              <option value="sm">S</option>
+              <option value="md">M ✓</option>
+              <option value="lg">L</option>
+              <option value="xl">XL</option>
+            </select>
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Peso del Título">
+            <select value={config.titleWeight || 'black'} onChange={e => onChange('titleWeight', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold focus:border-purple-500 outline-none">
+              <option value="light">Light — Fino</option>
+              <option value="normal">Normal</option>
+              <option value="semibold">Semibold</option>
+              <option value="bold">Bold</option>
+              <option value="extrabold">Extrabold</option>
+              <option value="black">Black ✓</option>
+            </select>
+          </Field>
+          <Field label="Estilo del Título">
+            <select value={config.titleStyle || 'normal'} onChange={e => onChange('titleStyle', e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold focus:border-purple-500 outline-none">
+              <option value="normal">Normal</option>
+              <option value="italic">Cursiva</option>
+            </select>
+          </Field>
+        </div>
+      </Accordion>
+
+      {/* ════ 4. COLORES DE TEXTO ════ */}
+      <Accordion id="textcolors" icon="🖌️" title="Colores de Texto">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Color del Texto Principal">
+            <div className="flex gap-2 items-center">
+              <input type="color" value={config.textColor || '#ffffff'} onChange={e => onChange('textColor', e.target.value)}
+                className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+              <input type="text" value={config.textColor || '#ffffff'} onChange={e => onChange('textColor', e.target.value)}
+                className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+            </div>
+          </Field>
+          <Field label="Color del Acento / Botones">
+            <div className="flex gap-2 items-center">
+              <input type="color" value={config.accentColor || '#a855f7'} onChange={e => onChange('accentColor', e.target.value)}
+                className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
+              <input type="text" value={config.accentColor || '#a855f7'} onChange={e => onChange('accentColor', e.target.value)}
+                className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+            </div>
+          </Field>
+        </div>
+      </Accordion>
+
+      {/* ════ 5. EFECTOS Y DECORACIÓN ════ */}
+      <Accordion id="effects" icon="✨" title="Efectos y Decoración">
+        <Field label="Decoración SVG" hint="Elemento gráfico adicional superpuesto al fondo.">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { k: 'none',  icon: '⬛', label: 'Ninguna' },
+              { k: 'waves', icon: '🌊', label: 'Olas'    },
+              { k: 'blob',  icon: '🫧', label: 'Burbuja' },
+              { k: 'grid',  icon: '⊞',  label: 'Cuadrícula' },
+            ].map(opt => (
+              <button key={opt.k} type="button"
+                onClick={() => onChange('decoration', opt.k)}
+                className={`flex flex-col items-center gap-1 py-3 rounded-xl border text-xs font-bold transition-all ${
+                  (config.decoration || 'none') === opt.k
+                    ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                    : 'border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                }`}>
+                <span className="text-lg">{opt.icon}</span>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+      </Accordion>
+    </div>
+  )
+}
+
 
 // ─── Google Fonts Picker con Buscador y Preview ───────────────────────────────
 const GOOGLE_FONTS = [

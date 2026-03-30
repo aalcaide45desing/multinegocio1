@@ -840,8 +840,7 @@ export default async function HomePage() {
     
     if (t.fontFamily) wrapStyle.fontFamily = `'${t.fontFamily}', sans-serif`
     if (t.heightPx > 0) {
-      wrapStyle.height = `${t.heightPx}px`
-      wrapStyle.overflow = 'hidden'
+      wrapStyle.minHeight = `${t.heightPx}px`
     }
     if (c.paddingYPx != null && c.paddingYPx >= 0) {
       wrapStyle.paddingTop = `${c.paddingYPx}px`
@@ -856,7 +855,47 @@ export default async function HomePage() {
 
     const alignClass = c.textAlign === 'left' ? 'text-left' : c.textAlign === 'right' ? 'text-right' : ''
 
-    const hasBgImage = !!c.backgroundImageUrl
+    // ── Resolución del fondo según bgMode ──────────────────────────────────
+    const bgMode = c.bgMode || (c.backgroundImageUrl ? 'image' : 'solid')
+    let bgAnimClass = ''
+    let bgGlowColor = ''
+
+    if (bgMode === 'gradient') {
+      const from = c.gradientFrom || '#7c3aed'
+      const to   = c.gradientTo   || '#000000'
+      const dir  = c.gradientDir  || 'to bottom'
+      if (dir === 'radial') {
+        wrapStyle.background = `radial-gradient(circle, ${from}, ${to})`
+      } else {
+        wrapStyle.background = `linear-gradient(${dir}, ${from}, ${to})`
+      }
+      c.color = 'transparent'
+    } else if (bgMode === 'animated') {
+      const c1 = c.animColor1 || '#7c3aed'
+      const c2 = c.animColor2 || '#000000'
+      const anim = c.bgAnimation || 'aurora'
+      if (anim === 'aurora') {
+        wrapStyle.background = `linear-gradient(-45deg, ${c1}, ${c2}, ${c1}80, ${c2})`
+        bgAnimClass = 'bg-anim-aurora'
+      } else if (anim === 'mesh') {
+        wrapStyle.background = c2
+        bgAnimClass = 'bg-anim-mesh'
+      } else if (anim === 'glow') {
+        wrapStyle.background = c2
+        bgGlowColor = c1
+        bgAnimClass = 'bg-anim-glow'
+      } else if (anim === 'noise') {
+        wrapStyle.background = c2
+        bgAnimClass = 'bg-anim-noise'
+      } else if (anim === 'particles') {
+        wrapStyle.background = c2
+      } else if (anim === 'waves') {
+        wrapStyle.background = c2
+      }
+      c.color = 'transparent'
+    }
+
+    const hasBgImage = bgMode === 'image' && !!c.backgroundImageUrl
 
     // Si hay imagen de fondo en el contenedor estricto, borramos el color del módulo para que no la tape
     if (hasBgImage) {
@@ -865,7 +904,13 @@ export default async function HomePage() {
     }
 
     return (
-      <div key={mod.id + '-wrap'} className={`relative overflow-hidden w-full ${alignClass}`} style={wrapStyle}>
+      <div key={mod.id + '-wrap'} className={`relative overflow-hidden w-full ${alignClass} ${bgAnimClass}`}
+        style={{ ...wrapStyle, ...(bgGlowColor ? { '--glow-color': bgGlowColor } as any : {}) }}>
+        {/* Capa de color glow para animación */}
+        {bgAnimClass === 'bg-anim-glow' && (
+          <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: bgGlowColor, opacity: 0.4 }} />
+        )}
+        {/* Imagen de fondo */}
         {hasBgImage && (
            <>
              <div className="absolute inset-0 z-0 pointer-events-none">
@@ -873,7 +918,7 @@ export default async function HomePage() {
                  className={`object-${c.bgSize || 'cover'} w-full h-full`} 
                  style={{ objectPosition: c.bgPosition || 'center' }} priority />
              </div>
-             <div className="absolute inset-0 z-[1] bg-black pointer-events-none" style={{ opacity: c.imageOverlayOpacity ?? 0.6 }} />
+             <div className="absolute inset-0 z-[1] bg-black pointer-events-none" style={{ opacity: c.imageOverlayOpacity ?? 0.5 }} />
            </>
         )}
         <div className="relative z-10 w-full h-full">
