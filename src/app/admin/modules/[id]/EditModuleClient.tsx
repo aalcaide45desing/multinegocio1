@@ -28,17 +28,15 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1">Espaciado Vertical</label>
-          <p className="text-[10px] text-zinc-600 mb-2">Controla el espacio vacío (aire) por arriba y abajo de esta sección para separarla de las demás.</p>
-          <select value={config.paddingY || 'md'} onChange={e => onChange('paddingY', e.target.value)}
-            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
-            <option value="none">Sin Espaciado (0px)</option>
-            <option value="xs">Mínimo (Muy estrecho)</option>
-            <option value="sm">Pequeño (Compacto)</option>
-            <option value="md">Normal (Equilibrado)</option>
-            <option value="lg">Grande (Espacioso)</option>
-            <option value="xl">Gigante (Hero-style)</option>
-          </select>
+          <label className="block text-sm font-medium text-zinc-400 mb-1">Espaciado Vertical (px)</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Espacio vacío (aire) arriba y abajo del contenido. Pon 0 para que el contenido toque los bordes.</p>
+          <div className="flex gap-3 items-center">
+            <input type="number" min="0" step="8" value={config.paddingYPx ?? ''} 
+              onChange={e => onChange('paddingYPx', e.target.value === '' ? null : parseInt(e.target.value))}
+              placeholder="Auto" 
+              className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
+            <span className="text-zinc-600 text-xs font-bold">px</span>
+          </div>
         </div>
       </div>
 
@@ -65,6 +63,42 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
             <option value="blob">Burbuja abstracta</option>
             <option value="grid">Cuadrícula técnica</option>
           </select>
+        </div>
+      </div>
+
+      {/* ── Layout y Alineación ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label className="block text-xs font-bold text-zinc-400 mb-1">Alineación del Texto</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Controla la alineación de todo el texto dentro de esta sección.</p>
+          <select value={config.textAlign || 'center'} onChange={e => onChange('textAlign', e.target.value)}
+            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold">
+            <option value="left">⬅ Izquierda</option>
+            <option value="center">⬛ Centro (Recomendado)</option>
+            <option value="right">➡ Derecha</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-zinc-400 mb-1">Padding Horizontal (px)</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Espacio a los lados del contenido. Déjalo vacío para automático.</p>
+          <div className="flex gap-3 items-center">
+            <input type="number" min="0" step="8" value={config.paddingXPx ?? ''} 
+              onChange={e => onChange('paddingXPx', e.target.value === '' ? null : parseInt(e.target.value))}
+              placeholder="Auto" 
+              className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
+            <span className="text-zinc-600 text-xs font-bold">px</span>
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-zinc-400 mb-1">Margen Superior (px)</label>
+          <p className="text-[10px] text-zinc-600 mb-2">Espacio extra antes de este módulo (separa del anterior).</p>
+          <div className="flex gap-3 items-center">
+            <input type="number" min="0" step="4" value={config.marginTopPx ?? ''} 
+              onChange={e => onChange('marginTopPx', e.target.value === '' ? null : parseInt(e.target.value))}
+              placeholder="0" 
+              className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
+            <span className="text-zinc-600 text-xs font-bold">px</span>
+          </div>
         </div>
       </div>
 
@@ -171,6 +205,41 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
                 placeholder="Ej: 32" 
                 className="flex-1 px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-sm font-bold" />
               <span className="text-zinc-600 text-xs font-bold">px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Fondo del Módulo ── */}
+      <div className="border-t border-zinc-800 pt-6">
+        <h4 className="font-semibold text-white text-sm uppercase tracking-widest mb-1">🖼️ Fondo Estilizado</h4>
+        <p className="text-[10px] text-zinc-600 mb-4">Puedes añadir una imagen de fondo a cualquier módulo.</p>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-zinc-400 mb-1">URL Imagen de Fondo</label>
+            <input type="text" value={config.backgroundImageUrl || ''} onChange={e => onChange('backgroundImageUrl', e.target.value)} placeholder="Ej: https://unsplash.com/..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 mb-1">Capa de Oscuridad</label>
+              <input type="range" min="0" max="1" step="0.05" value={config.imageOverlayOpacity ?? 0.6} onChange={e => onChange('imageOverlayOpacity', parseFloat(e.target.value))} className="w-full h-8 accent-purple-500 mt-1" />
+              <div className="text-center text-[10px] text-zinc-500">{Math.round((config.imageOverlayOpacity ?? 0.6) * 100)}% Oscuridad</div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 mb-1">Tamaño de la Imagen</label>
+              <select value={config.bgSize || 'cover'} onChange={e => onChange('bgSize', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-1">
+                <option value="cover">Rellenar todo (Corta bordes)</option>
+                <option value="contain">Ajustar (Muestra toda la imagen)</option>
+                <option value="auto">Tamaño Original (Sin ajuste)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 mb-1">Alineación de Imagen</label>
+              <select value={config.bgPosition || 'center'} onChange={e => onChange('bgPosition', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-1">
+                <option value="center">Centro</option>
+                <option value="top">Arriba</option>
+                <option value="bottom">Abajo</option>
+              </select>
             </div>
           </div>
         </div>
@@ -477,31 +546,8 @@ export default function EditModuleClient({ mod, initialSettings }: { mod: any; i
             </div>
 
             <div className="p-6 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-6">
-              <h4 className="font-semibold text-white text-sm uppercase tracking-widest">🖼️ Imagen y Diseño</h4>
-               <div className="space-y-4">
-                 <div>
-                   <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">URL Imagen de fondo</label>
-                   <input type="text" value={config.backgroundImageUrl || ''} onChange={e => set('backgroundImageUrl', e.target.value)} placeholder="https://unsplash.com/..." className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-[10px]" />
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                   <div>
-                     <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Opacidad Capa</label>
-                     <input type="range" min="0" max="1" step="0.05" value={config.imageOverlayOpacity ?? 0.5} onChange={e => set('imageOverlayOpacity', parseFloat(e.target.value))} className="w-full h-8 accent-purple-500 mt-2" />
-                     <div className="text-center text-[10px] text-zinc-500">{Math.round((config.imageOverlayOpacity || 0.5) * 100)}% Oscuridad</div>
-                   </div>
-                   <div>
-                     <label className="block text-[10px] text-zinc-500 mb-1 uppercase font-black">Alineación</label>
-                     <select value={config.textAlign || 'center'} onChange={e => set('textAlign', e.target.value)} className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs mt-2">
-                       <option value="left">Izquierda</option>
-                       <option value="center">Centro</option>
-                       <option value="right">Derecha</option>
-                     </select>
-                   </div>
-                 </div>
-               </div>
-               <div className="pt-4 border-t border-zinc-800">
-                 <div className="flex justify-between items-center mb-4">
-                    <h5 className="text-[10px] text-zinc-500 uppercase font-black">Botones de Llamada a la Acción</h5>
+               <div className="flex justify-between items-center mb-4">
+                  <h5 className="font-semibold text-white text-sm uppercase tracking-widest">Botones de Llamada a la Acción</h5>
                     <button onClick={() => addArrayItem('buttons', { text: 'Saber más', url: '#', style: 'primary' })} className="text-[10px] bg-zinc-800 px-3 py-1 rounded-lg border border-zinc-700 text-white font-bold">+ Botón</button>
                  </div>
                  <div className="space-y-3">
@@ -521,7 +567,6 @@ export default function EditModuleClient({ mod, initialSettings }: { mod: any; i
                </div>
             </div>
           </div>
-        </div>
       )}
 
       {/* ══════════════════════════════════════════════

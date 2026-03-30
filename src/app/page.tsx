@@ -61,6 +61,12 @@ const PADDING_Y: Record<string, string> = {
   xl: 'py-48 sm:py-64'
 }
 
+// Si el usuario puso px manual, devuelve cadena vacía (se aplica inline en el wrapper)
+function getPy(config: any, fallback: string = 'md'): string {
+  if (config.paddingYPx != null && config.paddingYPx >= 0) return 'py-0'
+  return PADDING_Y[config.paddingY] || PADDING_Y[fallback]
+}
+
 const MAX_WIDTH: Record<string, string> = {
   sm: 'max-w-4xl',
   md: 'max-w-6xl',
@@ -175,19 +181,11 @@ function NavbarModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function HeroModule({ config }: { config: any }) {
   const align = config.textAlign === 'left' ? 'text-left items-start' : config.textAlign === 'right' ? 'text-right items-end' : 'text-center items-center'
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.xl
+  const py = getPy(config, 'xl')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   const t = ts({ ...config, titleSize: config.titleSize || 'xl', subtitleSize: config.subtitleSize || 'lg' })
   return (
-    <section className={`relative overflow-hidden ${py} px-4 flex items-center min-h-[70vh]`} style={{ backgroundColor: config.color || '#18181b' }}>
-      {config.backgroundImageUrl && (
-        <>
-          <div className="absolute inset-0 z-0">
-            <Image src={config.backgroundImageUrl} alt="Hero" fill sizes="100vw" className="object-cover" priority />
-          </div>
-          <div className="absolute inset-0 z-[1] bg-black/60" style={{ opacity: config.imageOverlayOpacity ?? 0.6 }} />
-        </>
-      )}
+    <section className={`relative overflow-hidden ${py} px-4 flex items-center h-full`} style={{ backgroundColor: config.color || 'transparent' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto flex flex-col ${align} gap-8 w-full`}>
         {config.preTitleBadge && <span className="inline-block px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-white font-black text-[10px] sm:text-xs uppercase tracking-[0.3em]">{config.preTitleBadge}</span>}
@@ -203,11 +201,11 @@ function HeroModule({ config }: { config: any }) {
 // SCHEDULE (Horarios)
 // ════════════════════════════════════════════════════════
 function ScheduleModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   const accent = 'var(--brand-primary, #a855f7)'
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
         <div className="text-center mb-16 max-w-2xl mx-auto">
@@ -248,10 +246,10 @@ function ScheduleModule({ config }: { config: any }) {
 // STATS (Métricas)
 // ════════════════════════════════════════════════════════
 function StatsModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.sm
+  const py = getPy(config, 'sm')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden bg-white/5`} style={{ backgroundColor: config.color }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <Deco type={config.decoration} />
        <div className={`${mw} mx-auto relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 text-center`}>
           {(config.stats || []).map((s: any, i: number) => (
@@ -269,10 +267,10 @@ function StatsModule({ config }: { config: any }) {
 // FAQ
 // ════════════════════════════════════════════════════════
 function FaqModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.sm
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#000' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <Deco type={config.decoration} />
        <div className={`${mw} mx-auto relative z-10`}>
           <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-16 text-center tracking-tighter`}>{config.title || 'FAQ'}</h2>
@@ -298,10 +296,10 @@ function FaqModule({ config }: { config: any }) {
 // STEPS (Pasos)
 // ════════════════════════════════════════════════════════
 function StepsModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10`}>
           <div className="mb-20">
              <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-4 tracking-tighter`}>{config.title || 'Proceso'}</h2>
@@ -327,10 +325,10 @@ function StepsModule({ config }: { config: any }) {
 // VIDEO
 // ════════════════════════════════════════════════════════
 function VideoModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative bg-zinc-950 overflow-hidden`} style={{ backgroundColor: config.color }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10`}>
           <div className="text-center mb-12">
              <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white tracking-tighter`}>{config.title || 'Vídeo'}</h2>
@@ -348,11 +346,11 @@ function VideoModule({ config }: { config: any }) {
 // IMAGE + TEXT
 // ════════════════════════════════════════════════════════
 function ImageTextModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   const rev = config.layout === 'image_right' ? 'lg:flex-row-reverse' : 'lg:flex-row'
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10 flex flex-col ${rev} gap-12 lg:gap-24 items-center`}>
           <div className="flex-1 w-full">
              <div className="relative aspect-square rounded-[3rem] overflow-hidden border-8 border-white/5 shadow-2xl group">
@@ -378,10 +376,10 @@ function ImageTextModule({ config }: { config: any }) {
 // NEWSLETTER
 // ════════════════════════════════════════════════════════
 function NewsletterModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.lg
+  const py = getPy(config, 'lg')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.sm
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#000' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <Deco type={config.decoration} />
        <div className={`relative z-10 ${mw} mx-auto text-center`}>
           <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-6 tracking-tighter leading-none`}>{config.title || 'Newsletter'}</h2>
@@ -400,10 +398,10 @@ function NewsletterModule({ config }: { config: any }) {
 // COUNTDOWN
 // ════════════════════════════════════════════════════════
 function CountdownModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.sm
   return (
-    <section className={`${py} px-4 relative overflow-hidden bg-purple-600`} style={{ backgroundColor: config.color }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#9333ea' }}>
        <Deco type={config.decoration || 'grid'} />
        <div className={`relative z-10 ${mw} mx-auto text-center text-white`}>
           <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} mb-12 tracking-tighter leading-none`}>{config.title || 'Falta poco'}</h2>
@@ -426,10 +424,10 @@ function CountdownModule({ config }: { config: any }) {
 // ════════════════════════════════════════════════════════
 function FeaturesModule({ config }: { config: any }) {
   const cols = config.columns === 2 ? 'sm:grid-cols-2' : config.columns === 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-3'
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
         <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-16 text-center tracking-tighter`}>{config.title || 'Servicios'}</h2>
@@ -448,10 +446,10 @@ function FeaturesModule({ config }: { config: any }) {
 }
 
 function PricingModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden border-t border-white/5`} style={{ backgroundColor: config.color || '#000' }}>
+    <section className={`${py} px-4 relative overflow-hidden border-t border-white/5`} style={{ backgroundColor: config.color || 'transparent' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
         <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-16 text-center tracking-tighter`}>{config.title || 'Tarifas'}</h2>
@@ -479,10 +477,10 @@ function PricingModule({ config }: { config: any }) {
 }
 
 function TeamModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#09090b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto`}>
         <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-16 text-center tracking-tighter`}>{config.title || 'Equipo'}</h2>
@@ -504,10 +502,10 @@ function TeamModule({ config }: { config: any }) {
 }
 
 function GalleryModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.sm
+  const py = getPy(config, 'sm')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.full
   return (
-    <section className={`${py} px-2 relative bg-black`} style={{ backgroundColor: config.color }}>
+    <section className={`${py} px-2 relative`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10 grid grid-cols-2 md:grid-cols-4 gap-2`}>
           {(config.images || []).map((img: any, i: number) => (
              <div key={i} className="aspect-square relative overflow-hidden group rounded-[2rem]">
@@ -520,7 +518,7 @@ function GalleryModule({ config }: { config: any }) {
 }
 
 function ContactModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   const settings = config._global
   
@@ -539,7 +537,7 @@ function ContactModule({ config }: { config: any }) {
   const mapUrl = isGlobal ? settings?.locationMapUrl : (config.mapEmbedUrl || settings?.locationMapUrl)
 
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10 grid lg:grid-cols-2 gap-24 items-center`}>
           <div>
              <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-12 tracking-tighter uppercase leading-none`}>{config.title || 'Contacto'}</h2>
@@ -576,10 +574,10 @@ function ContactModule({ config }: { config: any }) {
 }
 
 function CtaBannerModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#1a0533' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <Deco type={config.decoration || 'blob'} />
        <div className={`${mw} mx-auto relative z-10 text-center space-y-8`}>
           {config.badgeText && <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/10">{config.badgeText}</span>}
@@ -594,10 +592,10 @@ function CtaBannerModule({ config }: { config: any }) {
 }
 
 function SocialLinksModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.sm
+  const py = getPy(config, 'sm')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10 text-center`}>
           <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">{config.title || 'Síguenos'}</h2>
           <p className="text-zinc-500 mb-12 uppercase font-bold text-xs tracking-widest">{config.subtitle}</p>
@@ -618,11 +616,11 @@ function SocialLinksModule({ config }: { config: any }) {
 }
 
 function TextColumnsModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   const cols = config.columns === 2 ? 'md:grid-cols-2' : config.columns === 3 ? 'md:grid-cols-3' : 'grid-cols-1'
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#18181b' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10`}>
           {config.title && <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-16 tracking-tighter uppercase`}>{config.title}</h2>}
           <div className={`grid grid-cols-1 ${cols} gap-12 sm:gap-20`}>
@@ -639,7 +637,7 @@ function TextColumnsModule({ config }: { config: any }) {
 }
 
 function BookingModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   const settings = config._global
   
@@ -649,7 +647,7 @@ function BookingModule({ config }: { config: any }) {
   const whatsappPhone = isGlobal ? (settings?.contactPhones?.[0] || "") : (config.whatsapp || settings?.contactPhones?.[0] || "")
 
   return (
-    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || '#000' }}>
+    <section className={`${py} px-4 relative overflow-hidden`} style={{ backgroundColor: config.color || 'transparent' }}>
       <Deco type={config.decoration} />
       <div className={`relative z-10 ${mw} mx-auto text-center`}>
         <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-6 tracking-tighter leading-none`}>{config.title || 'Reserva Online'}</h2>
@@ -683,10 +681,10 @@ function BookingModule({ config }: { config: any }) {
 }
 
 function ReviewsModule({ config }: { config: any }) {
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.md
   return (
-    <section className={`${py} px-4 relative overflow-hidden bg-zinc-950 border-t border-white/5`}>
+    <section className={`${py} px-4 relative overflow-hidden border-t border-white/5`} style={{ backgroundColor: config.color || 'transparent' }}>
        <div className={`${mw} mx-auto relative z-10`}>
           <h2 className={`${ts(config).title} ${ts(config).weight} ${ts(config).style} text-white mb-16 tracking-tighter text-center`}>{config.title || 'Reseñas'}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -705,7 +703,7 @@ function ReviewsModule({ config }: { config: any }) {
 
 function FooterModule({ config }: { config: any }) {
   const settings = config._global
-  const py = PADDING_Y[config.paddingY] || PADDING_Y.md
+  const py = getPy(config, 'md')
   const mw = MAX_WIDTH[config.maxWidth] || MAX_WIDTH.lg
   
   // Sincronización de Identidad
@@ -720,7 +718,7 @@ function FooterModule({ config }: { config: any }) {
   const phones = settings?.contactPhones || []
 
   return (
-    <footer className={`${py} px-8 border-t border-white/5 bg-black relative`} style={{ backgroundColor: config.bgColor }}>
+    <footer className={`${py} px-8 border-t border-white/5 relative`} style={{ backgroundColor: config.bgColor || 'transparent' }}>
       <div className={`${mw} mx-auto flex flex-col items-center text-center gap-12 relative z-10`}>
         <h2 className="text-5xl font-black text-white tracking-widest uppercase">{businessName || 'Mi Negocio'}</h2>
         
@@ -833,21 +831,56 @@ export default async function HomePage() {
     }
   }
 
-  // Wrapper que aplica familia tipográfica, altura fija y separación
+  // Wrapper que aplica TODOS los controles visuales del usuario
   const renderWrapped = (mod: any) => {
-    const c = mod.config as any
+    const originalConfig = mod.config as any
+    const c = { ...originalConfig }
     const t = ts(c)
     const wrapStyle: React.CSSProperties = {}
+    
     if (t.fontFamily) wrapStyle.fontFamily = `'${t.fontFamily}', sans-serif`
     if (t.heightPx > 0) {
       wrapStyle.height = `${t.heightPx}px`
       wrapStyle.overflow = 'hidden'
     }
+    if (c.paddingYPx != null && c.paddingYPx >= 0) {
+      wrapStyle.paddingTop = `${c.paddingYPx}px`
+      wrapStyle.paddingBottom = `${c.paddingYPx}px`
+    }
+    if (c.paddingXPx != null && c.paddingXPx >= 0) {
+      wrapStyle.paddingLeft = `${c.paddingXPx}px`
+      wrapStyle.paddingRight = `${c.paddingXPx}px`
+    }
+    if (c.marginTopPx) wrapStyle.marginTop = `${c.marginTopPx}px`
     if (t.mb) wrapStyle.marginBottom = t.mb
-    const hasStyle = Object.keys(wrapStyle).length > 0
-    return hasStyle
-      ? <div key={mod.id + '-wrap'} style={wrapStyle}>{render(mod)}</div>
-      : render(mod)
+
+    const alignClass = c.textAlign === 'left' ? 'text-left' : c.textAlign === 'right' ? 'text-right' : ''
+
+    const hasBgImage = !!c.backgroundImageUrl
+
+    // Si hay imagen de fondo en el contenedor estricto, borramos el color del módulo para que no la tape
+    if (hasBgImage) {
+      c.color = 'transparent'
+      c.bgColor = 'transparent'
+    }
+
+    return (
+      <div key={mod.id + '-wrap'} className={`relative overflow-hidden w-full ${alignClass}`} style={wrapStyle}>
+        {hasBgImage && (
+           <>
+             <div className="absolute inset-0 z-0 pointer-events-none">
+               <Image src={c.backgroundImageUrl} alt="Fondo de módulo" fill sizes="100vw" 
+                 className={`object-${c.bgSize || 'cover'} w-full h-full`} 
+                 style={{ objectPosition: c.bgPosition || 'center' }} priority />
+             </div>
+             <div className="absolute inset-0 z-[1] bg-black pointer-events-none" style={{ opacity: c.imageOverlayOpacity ?? 0.6 }} />
+           </>
+        )}
+        <div className="relative z-10 w-full h-full">
+           {render({ ...mod, config: c })}
+        </div>
+      </div>
+    )
   }
 
   // Recopilar todas las Google Fonts usadas por los módulos

@@ -18,13 +18,16 @@ async function downloadAndOptimize(url) {
 
     try {
         const hash = crypto.createHash('md5').update(url).digest('hex');
-        const optimizedFilename = `${hash}.webp`;
-        const filePath = path.join(PUBLIC_IMG_DIR, optimizedFilename);
-        const webPath = `/images/optimized/${optimizedFilename}`;
+        const webpPath = path.join(PUBLIC_IMG_DIR, `${hash}.webp`);
+        const gifPath = path.join(PUBLIC_IMG_DIR, `${hash}.gif`);
 
-        if (fs.existsSync(filePath)) {
-            console.log(`⚡ Ya estaba optimizada (Cache): ${webPath}`);
-            return webPath;
+        if (fs.existsSync(gifPath)) {
+            console.log(`⚡ Ya estaba en cache (GIF): /images/optimized/${hash}.gif`);
+            return `/images/optimized/${hash}.gif`;
+        }
+        if (fs.existsSync(webpPath)) {
+            console.log(`⚡ Ya estaba en cache (WebP): /images/optimized/${hash}.webp`);
+            return `/images/optimized/${hash}.webp`;
         }
 
         console.log(`⬇️ Descargando imagen original desde: ${url}`);
@@ -35,14 +38,22 @@ async function downloadAndOptimize(url) {
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        // Convertimos a WebP, resolucion máxima 1200px (suficiente para Desktop/Mobile sin pesar)
-        await sharp(buffer)
-            .resize(1200, null, { withoutEnlargement: true }) 
-            .webp({ quality: 80 })
-            .toFile(filePath);
-
-        console.log(`✅ ¡Optimizada y Guardada en local! Ruta final: ${webPath}`);
-        return webPath;
+        // Detectar si la imagen original es un GIF
+        const metadata = await sharp(buffer).metadata();
+        
+        if (metadata.format === 'gif') {
+            console.log(`🎨 Detectado formato GIF, guardando sin alterar...`);
+            fs.writeFileSync(gifPath, buffer);
+            return `/images/optimized/${hash}.gif`;
+        } else {
+            // Convertimos a WebP, resolucion máxima 1200px (suficiente para Desktop/Mobile sin pesar)
+            await sharp(buffer)
+                .resize(1200, null, { withoutEnlargement: true }) 
+                .webp({ quality: 80 })
+                .toFile(webpPath);
+            console.log(`✅ ¡Optimizada y Guardada localmente como WebP!`);
+            return `/images/optimized/${hash}.webp`;
+        }
     } catch (e) {
         console.error(`❌ Falló la optimización de ${url}. Usando la URL original por seguridad. Error:`, e.message);
         return url; 
