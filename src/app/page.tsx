@@ -82,17 +82,27 @@ const BTN_PRESETS: Record<string, (primaryBg: string, primaryText: string, custo
 function Buttons({ buttons, config, size = 'lg' }: { buttons?: any[]; config: any; size?: 'sm' | 'lg' }) {
   if (!buttons?.length) return null
   
-  const primaryBg = config._global ? 'var(--brand-primary)' : (config.accentColor || config.brandColor || '#a855f7')
-  const primaryText = config._global ? 'var(--brand-bg)' : '#000000'
-  const sizeClass = size === 'lg' ? 'text-sm sm:text-base' : 'text-xs'
+  const globalBg   = config._global ? 'var(--brand-primary)' : (config.accentColor || config.brandColor || '#a855f7')
+  const globalText = config._global ? 'var(--brand-bg)' : '#000000'
+  const sizeClass  = size === 'lg' ? 'text-sm sm:text-base' : 'text-xs'
 
   return (
     <div className="flex flex-wrap gap-4">
       {buttons.map((btn: any) => {
+        // Colores efectivos: si el botón tiene color propio, úsalo; si no, usa el global
+        const effectiveBg   = btn.btnColor    || globalBg
+        const effectiveText = btn.btnTextColor || globalText
+        
         const preset = BTN_PRESETS[btn.style] || BTN_PRESETS['primary']
-        const { className, style } = preset(primaryBg, primaryText, btn.customColor)
+        const { className, style } = preset(effectiveBg, effectiveText, btn.customColor)
+        
+        // Si hay color personalizado en el botón, sobreescribir los estilos clave del preset
+        const finalStyle = btn.btnColor
+          ? { ...style, backgroundColor: effectiveBg, color: effectiveText, borderColor: effectiveBg }
+          : style
+
         return (
-          <a key={btn.id} href={btn.url || '#'} className={`${className} ${sizeClass}`} style={style}>
+          <a key={btn.id} href={btn.url || '#'} className={`${className} ${sizeClass}`} style={finalStyle}>
             {btn.text}
             {btn.style === 'minimal' && <span className="ml-2">→</span>}
           </a>
@@ -101,6 +111,7 @@ function Buttons({ buttons, config, size = 'lg' }: { buttons?: any[]; config: an
     </div>
   )
 }
+
 
 
 // ─── Mapeos de Tamaño ───────────────────────────────────────────────────────

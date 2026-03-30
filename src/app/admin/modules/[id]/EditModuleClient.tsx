@@ -346,24 +346,19 @@ function StyleSection({ config, onChange }: { config: any; onChange: (key: strin
       {/* ════ 4. COLORES DE TEXTO ════ */}
       <Accordion id="textcolors" icon="🖌️" title="Colores de Texto">
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Color del Texto Principal">
-            <div className="flex gap-2 items-center">
-              <input type="color" value={config.textColor || '#ffffff'} onChange={e => onChange('textColor', e.target.value)}
-                className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
-              <input type="text" value={config.textColor || '#ffffff'} onChange={e => onChange('textColor', e.target.value)}
-                className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
-            </div>
-          </Field>
-          <Field label="Color del Acento / Botones">
-            <div className="flex gap-2 items-center">
-              <input type="color" value={config.accentColor || '#a855f7'} onChange={e => onChange('accentColor', e.target.value)}
-                className="w-12 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
-              <input type="text" value={config.accentColor || '#a855f7'} onChange={e => onChange('accentColor', e.target.value)}
-                className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
-            </div>
-          </Field>
+          <ColorPicker
+            label="Color del Texto Principal"
+            value={config.textColor || '#ffffff'}
+            onChange={v => onChange('textColor', v)}
+          />
+          <ColorPicker
+            label="Color del Acento / Botones"
+            value={config.accentColor || '#a855f7'}
+            onChange={v => onChange('accentColor', v)}
+          />
         </div>
       </Accordion>
+
 
       {/* ════ 5. EFECTOS Y DECORACIÓN ════ */}
       <Accordion id="effects" icon="✨" title="Efectos y Decoración">
@@ -543,113 +538,199 @@ function useArrayHelpers(config: any, setConfig: React.Dispatch<React.SetStateAc
   return { handleArrayChange, addArrayItem, removeArrayItem, handleDayIntervalChange, addDayInterval, removeDayInterval }
 }
 
+// ─── Mini selector de color inline ───────────────────────────────────────────
+function ColorPicker({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <p className="text-[10px] text-zinc-500 uppercase font-black mb-1.5">{label}</p>
+      <div className="flex gap-2 items-center">
+        <input type="color" value={value} onChange={e => onChange(e.target.value)}
+          className="w-9 h-9 p-0.5 rounded-lg cursor-pointer bg-zinc-900 border border-zinc-700 shrink-0 hover:scale-105 transition-transform" />
+        <input type="text" value={value} onChange={e => onChange(e.target.value)}
+          className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white font-mono text-xs focus:border-purple-500 outline-none uppercase" />
+      </div>
+    </div>
+  )
+}
+
 // ─── Editor de Botones Reutilizable ───────────────────────────────────────────
 const BUTTON_PRESETS = [
-  { k: 'primary',      icon: '⬛', label: 'Sólido',       desc: 'Clásico y efectivo' },
-  { k: 'outline',      icon: '⬜', label: 'Contorno',      desc: 'Elegante y ligero' },
-  { k: 'ghost',        icon: '👻', label: 'Fantasma',      desc: 'Sutil y limpio' },
-  { k: 'glow',         icon: '✨', label: 'Glow',          desc: 'Efecto brillante' },
-  { k: 'pill',         icon: '💊', label: 'Píldora',       desc: 'Bordes máximos' },
-  { k: 'pill-outline', icon: '○',  label: 'Píldora Borde', desc: 'Abierto y moderno' },
-  { k: 'neon',         icon: '🌟', label: 'Neón',          desc: 'Futurista' },
-  { k: 'glass',        icon: '🔷', label: 'Cristal',       desc: 'Glassmorphism' },
-  { k: 'minimal',      icon: '→',  label: 'Minimal',       desc: 'Solo texto + flecha' },
-  { k: 'gradient',     icon: '🌈', label: 'Degradado',     desc: 'Dos colores' },
+  { k: 'primary',      icon: '⬛', label: 'Sólido'   },
+  { k: 'outline',      icon: '⬜', label: 'Contorno' },
+  { k: 'ghost',        icon: '👻', label: 'Fantasma' },
+  { k: 'glow',         icon: '✨', label: 'Glow'     },
+  { k: 'pill',         icon: '💊', label: 'Píldora'  },
+  { k: 'pill-outline', icon: '○',  label: 'P.Borde'  },
+  { k: 'neon',         icon: '🌟', label: 'Neón'     },
+  { k: 'glass',        icon: '🔷', label: 'Cristal'  },
+  { k: 'minimal',      icon: '→',  label: 'Minimal'  },
+  { k: 'gradient',     icon: '🌈', label: 'Degrad.'  },
 ]
 
 function ButtonsEditor({ config, onChange }: { config: any; onChange: (key: string, val: any) => void }) {
   const buttons: any[] = config.buttons || []
-  
+
   const addBtn = () => {
-    const newBtn = { id: Math.random().toString(36).slice(2), text: 'Llamada a la acción', url: '#', style: 'primary' }
+    const newBtn = {
+      id: Math.random().toString(36).slice(2),
+      text: 'Descúbrelo ahora',
+      url: '',
+      style: 'primary',
+      btnColor: '',
+      btnTextColor: '',
+      customColor: '',
+    }
     onChange('buttons', [...buttons, newBtn])
   }
-  
+
   const removeBtn = (i: number) => {
     const nb = [...buttons]; nb.splice(i, 1); onChange('buttons', nb)
   }
-  
+
   const updateBtn = (i: number, field: string, val: string) => {
     const nb = [...buttons]; nb[i] = { ...nb[i], [field]: val }; onChange('buttons', nb)
   }
 
   return (
     <div className="border border-zinc-800 rounded-2xl overflow-hidden">
+      {/* Cabecera */}
       <div className="flex items-center justify-between px-5 py-4 bg-zinc-900/60">
         <div className="flex items-center gap-3">
-          <span className="text-xl">🖱️</span>
+          <span className="text-lg">🖱️</span>
           <span className="font-bold text-white text-sm uppercase tracking-wider">Botones CTA</span>
-          <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-[10px] font-mono">{buttons.length} botones</span>
+          <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-[10px] font-mono">{buttons.length}</span>
         </div>
         <button type="button" onClick={addBtn}
           className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors">
-          + Botón
+          + Añadir Botón
         </button>
       </div>
-      
+
+      {/* Estado vacío */}
       {buttons.length === 0 && (
-        <div className="px-5 py-8 text-center bg-zinc-950/40">
-          <p className="text-zinc-600 text-xs mb-3">Sin botones aún. Añade uno para que los visitantes puedan actuar.</p>
+        <div className="px-5 py-10 text-center bg-zinc-950/40">
+          <div className="text-4xl mb-3">🖱️</div>
+          <p className="text-zinc-500 text-xs mb-4">Sin botones. Añade uno para que tus visitantes puedan actuar.</p>
           <button type="button" onClick={addBtn}
             className="px-6 py-2.5 border border-dashed border-zinc-700 text-zinc-500 text-xs font-bold rounded-xl hover:border-purple-500 hover:text-purple-400 transition-all">
-            + Añadir primer botón
+            + Primer botón
           </button>
         </div>
       )}
-      
-      <div className="divide-y divide-zinc-800/50">
-        {buttons.map((btn: any, i: number) => (
-          <div key={btn.id || i} className="p-5 bg-zinc-950/40 space-y-4">
-            {/* Fila superior: texto + URL + eliminar */}
-            <div className="flex gap-3 items-center">
-              <input type="text" value={btn.text || ''} onChange={e => updateBtn(i, 'text', e.target.value)}
-                placeholder="Texto del botón"
-                className="flex-1 px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white font-bold text-sm focus:border-purple-500 outline-none" />
-              <input type="text" value={btn.url || ''} onChange={e => updateBtn(i, 'url', e.target.value)}
-                placeholder="https://... o #seccion"
-                className="flex-1 px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 text-xs focus:border-purple-500 outline-none" />
-              <button type="button" onClick={() => removeBtn(i)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0">✕</button>
-            </div>
-            
-            {/* Selector visual de preset */}
-            <div>
-              <p className="text-[10px] text-zinc-500 uppercase font-black mb-2">Diseño Preestablecido</p>
-              <div className="grid grid-cols-5 gap-1.5">
-                {BUTTON_PRESETS.map(preset => (
-                  <button key={preset.k} type="button"
-                    title={preset.desc}
-                    onClick={() => updateBtn(i, 'style', preset.k)}
-                    className={`flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl border text-center transition-all ${
-                      btn.style === preset.k
-                        ? 'border-purple-500 bg-purple-500/20 text-purple-300'
-                        : 'border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
-                    }`}>
-                    <span className="text-base leading-none">{preset.icon}</span>
-                    <span className="text-[8px] font-bold uppercase leading-none mt-0.5">{preset.label}</span>
-                  </button>
-                ))}
+
+      {/* Lista de botones */}
+      <div className="divide-y divide-zinc-800/40">
+        {buttons.map((btn: any, i: number) => {
+          const hasCustomColor = !!btn.btnColor
+          return (
+            <div key={btn.id || i} className="bg-zinc-950/40">
+              {/* Header del botón */}
+              <div className="flex items-center gap-2 px-5 pt-4 pb-2">
+                <span className="text-[10px] text-zinc-600 font-black uppercase">Botón {i + 1}</span>
+                <div className="flex-1 h-px bg-zinc-800" />
+                <button type="button" onClick={() => removeBtn(i)}
+                  className="text-zinc-700 hover:text-red-400 hover:bg-red-400/10 w-6 h-6 rounded flex items-center justify-center text-xs transition-all">✕</button>
               </div>
-            </div>
-            
-            {/* Color degradado si aplica */}
-            {btn.style === 'gradient' && (
-              <div>
-                <p className="text-[10px] text-zinc-500 uppercase font-black mb-2">Color Secundario del Degradado</p>
-                <div className="flex gap-2 items-center">
-                  <input type="color" value={btn.customColor || '#06b6d4'} onChange={e => updateBtn(i, 'customColor', e.target.value)}
-                    className="w-10 h-10 p-1 rounded-lg cursor-pointer bg-zinc-950 border border-zinc-800 shrink-0" />
-                  <input type="text" value={btn.customColor || '#06b6d4'} onChange={e => updateBtn(i, 'customColor', e.target.value)}
-                    className="flex-1 px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white uppercase font-mono text-[10px] focus:border-purple-500 outline-none" />
+
+              <div className="px-5 pb-5 space-y-4">
+                {/* Texto + URL en columnas */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[10px] text-zinc-500 uppercase font-black mb-1.5">Texto del Botón</p>
+                    <input type="text" value={btn.text || ''} onChange={e => updateBtn(i, 'text', e.target.value)}
+                      placeholder="Ej: Contactar ahora"
+                      className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white font-bold text-sm focus:border-purple-500 outline-none transition-colors" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-zinc-500 uppercase font-black mb-1.5">Enlace (URL)</p>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-xs select-none">🔗</span>
+                      <input type="text" value={btn.url || ''} onChange={e => updateBtn(i, 'url', e.target.value)}
+                        placeholder="https://... o #seccion"
+                        className="w-full pl-8 pr-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-zinc-300 text-xs focus:border-purple-500 outline-none transition-colors" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Selector de diseño */}
+                <div>
+                  <p className="text-[10px] text-zinc-500 uppercase font-black mb-2">Diseño</p>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {BUTTON_PRESETS.map(preset => (
+                      <button key={preset.k} type="button"
+                        title={preset.k}
+                        onClick={() => updateBtn(i, 'style', preset.k)}
+                        className={`flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl border text-center transition-all ${
+                          btn.style === preset.k
+                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            : 'border-zinc-800 bg-zinc-900/50 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                        }`}>
+                        <span className="text-sm leading-none">{preset.icon}</span>
+                        <span className="text-[8px] font-bold uppercase leading-tight mt-0.5">{preset.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Colores personalizados */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <p className="text-[10px] text-zinc-500 uppercase font-black">Color personalizado</p>
+                    <button type="button"
+                      onClick={() => updateBtn(i, 'btnColor', hasCustomColor ? '' : '#a855f7')}
+                      className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase border transition-all ${
+                        hasCustomColor
+                          ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                          : 'border-zinc-700 bg-zinc-900 text-zinc-500 hover:border-zinc-500'
+                      }`}>
+                      {hasCustomColor ? '✓ Activado' : 'Activar'}
+                    </button>
+                  </div>
+
+                  {hasCustomColor && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <ColorPicker
+                        label="Color de Fondo"
+                        value={btn.btnColor || '#a855f7'}
+                        onChange={v => updateBtn(i, 'btnColor', v)}
+                      />
+                      <ColorPicker
+                        label="Color del Texto"
+                        value={btn.btnTextColor || '#ffffff'}
+                        onChange={v => updateBtn(i, 'btnTextColor', v)}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Color secundario del degradado */}
+                {btn.style === 'gradient' && (
+                  <ColorPicker
+                    label="Color Secundario del Degradado →"
+                    value={btn.customColor || '#06b6d4'}
+                    onChange={v => updateBtn(i, 'customColor', v)}
+                  />
+                )}
+
+                {/* Mini preview del botón */}
+                <div className="pt-1 flex justify-center">
+                  <div className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all pointer-events-none"
+                    style={hasCustomColor
+                      ? { backgroundColor: btn.btnColor, color: btn.btnTextColor || '#fff', borderColor: btn.btnColor }
+                      : { backgroundColor: '#a855f740', color: '#c084fc', borderColor: '#a855f760' }
+                    }>
+                    {btn.text || 'Vista previa'}
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
 }
+
 
 
 
